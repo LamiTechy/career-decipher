@@ -1,0 +1,98 @@
+export const services = [
+  {
+    id: "career-consultation",
+    name: "Career Consultation",
+    duration: "30 mins",
+    price: 45,
+    icon: "Compass",
+    shortDesc: "Clarity on your next career move",
+    description:
+      "Feeling lost or stuck? This one-on-one session helps you map out a clear path forward. We'll assess your current situation, identify your strengths, and build a personalized strategy to help you land where you want to be.",
+    highlights: ["Career assessment & gap analysis", "Personalized action plan", "Industry-specific guidance", "Goal-setting framework"],
+    popular: false,
+  },
+  {
+    id: "resume-review",
+    name: "Resume Review",
+    duration: "30 mins",
+    price: 45,
+    icon: "FileText",
+    shortDesc: "Make your resume impossible to ignore",
+    description:
+      "Your resume is your first impression — make it count. We'll review your resume with the eyes of a hiring manager and an ATS system, giving you detailed feedback on structure, language, keywords, and impact.",
+    highlights: ["ATS optimization check", "Bullet point strengthening", "Formatting & design review", "Keyword alignment"],
+    popular: false,
+  },
+  {
+    id: "resume-cover-letter",
+    name: "Resume & Cover Letter Review",
+    duration: "1 hr",
+    price: 70,
+    icon: "FileCheck",
+    shortDesc: "A complete application package review",
+    description:
+      "Double your chances with a fully reviewed application package. We go deep into both your resume and cover letter — ensuring they work together as a cohesive, compelling narrative that gets you callbacks.",
+    highlights: ["Full resume audit & rewrite guidance", "Cover letter tone & structure", "Brand consistency check", "Tailoring tips per role"],
+    popular: true,
+  },
+  {
+    id: "cover-letter-review",
+    name: "Cover Letter Review",
+    duration: "30 mins",
+    price: 45,
+    icon: "Mail",
+    shortDesc: "Turn your cover letter into a door-opener",
+    description:
+      "A great cover letter tells your story in a way a resume can't. We'll help you craft a compelling narrative that hooks the reader, showcases your personality, and shows exactly why you're the right fit.",
+    highlights: ["Opening hook refinement", "Story & narrative flow", "Value proposition clarity", "Tone calibration per industry"],
+    popular: false,
+  },
+  {
+    id: "interview-prep",
+    name: "Interview Preparation",
+    duration: "1 hr",
+    price: 70,
+    icon: "Target",
+    shortDesc: "Walk in confident, walk out with the offer",
+    description:
+      "Interviews are a skill you can learn. In this deep-dive session, we'll run mock interviews, break down the STAR method, and coach you on how to handle tough questions, salary negotiations, and closing strong.",
+    highlights: ["Live mock interview session", "STAR method coaching", "Tough question strategies", "Salary negotiation tactics"],
+    popular: true,
+  },
+  {
+    id: "linkedin-optimization",
+    name: "LinkedIn Optimization",
+    duration: "Custom",
+    price: null,
+    icon: "Link2",
+    shortDesc: "Get found by the right recruiters",
+    description:
+      "LinkedIn is where opportunities find you — if your profile is set up right. We'll optimize every section of your profile to maximize visibility, attract recruiters, and position you as a thought leader in your field.",
+    highlights: ["Headline & summary rewrite", "Skills & endorsements strategy", "Recruiter visibility settings", "Content strategy tips"],
+    popular: false,
+  },
+  {
+    id: "mentorship",
+    name: "On-the-Job Mentorship",
+    duration: "1 hr",
+    price: 120,
+    icon: "Leaf",
+    shortDesc: "Navigate workplace challenges like a pro",
+    description:
+      "Starting a new role or struggling with office dynamics? This mentorship session gives you practical, personalized advice on how to thrive in your current position — from building relationships to managing up and setting yourself up for promotion.",
+    highlights: ["Navigating workplace politics", "Managing up & communication", "Building your personal brand at work", "90-day success planning"],
+    popular: false,
+  },
+  {
+    id: "bundle-package",
+    name: "Bundle Package",
+    duration: "5 hrs",
+    price: 250,
+    icon: "Package",
+    shortDesc: "Everything you need — maximum value",
+    description:
+      "Our all-in-one career transformation package. Five hours of dedicated, personalized support across every touchpoint of your job search — from strategy to resume to interviews. Ideal for anyone serious about making a career move.",
+    highlights: ["5 hours of 1-on-1 coaching", "Resume + cover letter + LinkedIn", "Interview prep included", "30-day follow-up email support"],
+    popular: true,
+  },
+];

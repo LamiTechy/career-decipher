@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E8A736"/>
+      <stop offset="100%" stop-color="#F2C94C"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" rx="24" fill="#FAEFD9" />
+  <path d="M34 38c10-12 24-12 34 0l-34 44-20-26c8-9 14-11 20-18z" fill="url(#gold)" opacity="0.95" />
+  <path d="M60 24c8 10 8 24 0 34L36 70c-6-14-4-28 10-40 8-6 10-8 14-6z" fill="#E8A736" opacity="0.85" />
+  <text x="60" y="102" text-anchor="middle" font-family="Inter, sans-serif" font-size="18" fill="#1F2937" font-weight="700">CD</text>
+</svg>

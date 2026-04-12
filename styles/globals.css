@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-cream: #FAEFD9;
+  --color-forest: #9B6F25;
+  --color-gold: #E8A736;
+  --color-dark: #0F1720;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background-color: var(--color-cream);
+  color: var(--color-dark);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #F7E5C1; }
+::-webkit-scrollbar-thumb { background: #E8A736; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #C88C2A; }
+
+/* React Calendar overrides */
+.react-calendar {
+  width: 100% !important;
+  border: none !important;
+  background: transparent !important;
+  font-family: 'DM Sans', sans-serif !important;
+}
+.react-calendar__tile {
+  padding: 10px 6px !important;
+  border-radius: 8px !important;
+  font-size: 0.875rem !important;
+  transition: all 0.15s !important;
+}
+.react-calendar__tile:enabled:hover {
+  background: #EBD8A5 !important;
+  color: #5D4118 !important;
+}
+.react-calendar__tile--active {
+  background: #E8A736 !important;
+  color: white !important;
+}
+.react-calendar__tile--now {
+  background: #EBD8A5 !important;
+  font-weight: 700 !important;
+}
+.react-calendar__navigation button {
+  font-size: 1rem !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-weight: 600 !important;
+}
+.react-calendar__navigation button:enabled:hover {
+  background: #EBD8A5 !important;
+  border-radius: 8px !important;
+}
+.react-calendar__month-view__weekdays__weekday {
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  color: #B07C2A !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+.react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none !important;
+}
+
+/* Animations */
+.animate-delay-100 { animation-delay: 100ms; }
+.animate-delay-200 { animation-delay: 200ms; }
+.animate-delay-300 { animation-delay: 300ms; }
+.animate-delay-400 { animation-delay: 400ms; }
+.animate-delay-500 { animation-delay: 500ms; }
+
+.opacity-0 { opacity: 0; }

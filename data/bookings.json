@@ -1,0 +1,356 @@
+[
+  {
+    "id": "c3cd83d1-fa01-45fc-8c5b-20a4c476c518",
+    "service": {
+      "id": "resume-review",
+      "name": "Resume Review",
+      "duration": "30 mins",
+      "price": 45
+    },
+    "date": "2026-04-12T19:19:12.249Z",
+    "time": "4:00 PM",
+    "customer": {
+      "name": "Amara Kessington",
+      "email": "amara.k@gmail.com",
+      "phone": "+1 (555) 123-4567",
+      "details": "Looking to transition from marketing into product management. 4 years experience."
+    },
+    "paymentStatus": "paid",
+    "status": "confirmed",
+    "createdAt": "2026-04-10T19:19:12.250Z",
+    "updatedAt": "2026-04-11T19:19:12.250Z"
+  },
+  {
+    "id": "dc71a7cc-3897-4a51-a4dc-91f518963650",
+    "service": {
+      "id": "linkedin-optimization",
+      "name": "LinkedIn Optimization",
+      "duration": "Custom",
+      "price": null
+    },
+    "date": "2026-04-13T19:19:12.250Z",
+    "time": "10:30 AM",
+    "customer": {
+      "name": "James Okafor",
+      "email": "james.okafor@outlook.com",
+      "phone": "+1 (555) 234-5678",
+      "details": "Preparing for final round interviews at Google and Meta."
+    },
+    "paymentStatus": "paid",
+    "status": "confirmed",
+    "createdAt": "2026-04-09T19:19:12.250Z",
+    "updatedAt": "2026-04-10T19:19:12.250Z"
+  },
+  {
+    "id": "015225e6-076a-4b5e-8374-7e0afde07035",
+    "service": {
+      "id": "resume-review",
+      "name": "Resume Review",
+      "duration": "30 mins",
+      "price": 45
+    },
+    "date": "2026-04-14T19:19:12.250Z",
+    "time": "3:00 PM",
+    "customer": {
+      "name": "Fatima Adeyemi",
+      "email": "fatima.a@proton.me",
+      "phone": "",
+      "details": "Recently laid off, need help refreshing my resume and LinkedIn profile."
+    },
+    "paymentStatus": "paid",
+    "status": "confirmed",
+    "createdAt": "2026-04-08T19:19:12.250Z",
+    "updatedAt": "2026-04-09T19:19:12.250Z"
+  },
+  {
+    "id": "44628ca7-cb9f-47ef-874c-32bcc23018e2",
+    "service": {
+      "id": "bundle-package",
+      "name": "Bundle Package",
+      "duration": "5 hrs",
+      "price": 250
+    },
+    "date": "2026-04-15T19:19:12.250Z",
+    "time": "10:00 AM",
+    "customer": {
+      "name": "Chen Wei",
+      "email": "chen.wei@yahoo.com",
+      "phone": "+1 (555) 456-7890",
+      "details": "Senior engineer looking for VP-level roles. Need executive presence coaching."
+    },
+    "paymentStatus": "paid",
+    "status": "completed",
+    "createdAt": "2026-04-07T19:19:12.250Z",
+    "updatedAt": "2026-04-08T19:19:12.250Z"
+  },
+  {
+    "id": "7a78379d-23c1-451d-b16f-644f99a80a8b",
+    "service": {
+      "id": "resume-review",
+      "name": "Resume Review",
+      "duration": "30 mins",
+      "price": 45
+    },
+    "date": "2026-04-10T19:19:12.250Z",
+    "time": "10:00 AM",
+    "customer": {
+      "name": "Priya Sharma",
+      "email": "priya.sharma@gmail.com",
+      "phone": "+1 (555) 567-8901",
+      "details": "New grad looking to land first job in data science."
+    },
+    "paymentStatus": "paid",
+    "status": "completed",
+    "createdAt": "2026-04-06T19:19:12.250Z",
+    "updatedAt": "2026-04-07T19:19:12.250Z"
+  },
+  {
+    "id": "8bc4e9f0-4571-4dbf-bf28-b469461e3d19",
+    "service": {
+      "id": "interview-prep",
+      "name": "Interview Preparation",
+      "duration": "1 hr",
+      "price": 70
+    },
+    "date": "2026-04-09T19:19:12.250Z",
+    "time": "10:00 AM",
+    "customer": {
+      "name": "Marcus Johnson",
+      "email": "mjohnson@hotmail.com",
+      "phone": "+1 (555) 678-9012",
+      "details": "Returning to workforce after 2-year career break. Need full overhaul."
+    },
+    "paymentStatus": "paid",
+    "status": "pending",
+    "createdAt": "2026-04-05T19:19:12.250Z",
+    "updatedAt": "2026-04-06T19:19:12.250Z"
+  },
+  {
+    "id": "7a92fa3f-8c80-450f-9cef-b76ebaae0393",
+    "service": {
+      "id": "resume-cover-letter",
+      "name": "Resume & Cover Letter Review",
+      "duration": "1 hr",
+      "price": 70
+    },
+    "date": "2026-04-08T19:19:12.250Z",
+    "time": "11:00 AM",
+    "customer": {
+      "name": "Yemi Adebayo",
+      "email": "yemi.adebayo@gmail.com",
+      "phone": "+1 (555) 789-0123",
+      "details": "Moving from Nigeria to Canada — need help positioning my experience for Canadian market."
+    },
+    "paymentStatus": "paid",
+    "status": "cancelled",
+    "createdAt": "2026-04-04T19:19:12.250Z",
+    "updatedAt": "2026-04-05T19:19:12.250Z"
+  },
+  {
+    "id": "675c2d04-5692-4033-8e54-c0b9aa8f5559",
+    "service": {
+      "id": "interview-prep",
+      "name": "Interview Preparation",
+      "duration": "1 hr",
+      "price": 70
+    },
+    "date": "2026-04-07T19:19:12.250Z",
+    "time": "10:00 AM",
+    "customer": {
+      "name": "Sarah O'Brien",
+      "email": "sarah.obrien@company.com",
+      "phone": "+1 (555) 890-1234",
+      "details": "Targeting FAANG companies specifically. 6 years of PM experience."
+    },
+    "paymentStatus": "paid",
+    "status": "confirmed",
+    "createdAt": "2026-04-03T19:19:12.250Z",
+    "updatedAt": "2026-04-04T19:19:12.250Z"
+  },
+  {
+    "id": "3bbb52e2-2b26-473c-a806-efb9a6af5e4b",
+    "service": {
+      "id": "career-consultation",
+      "name": "Career Consultation",
+      "duration": "30 mins",
+      "price": 45,
+      "icon": "🧭",
+      "shortDesc": "Clarity on your next career move",
+      "description": "Feeling lost or stuck? This one-on-one session helps you map out a clear path forward. We'll assess your current situation, identify your strengths, and build a personalized strategy to help you land where you want to be.",
+      "highlights": [
+        "Career assessment & gap analysis",
+        "Personalized action plan",
+        "Industry-specific guidance",
+        "Goal-setting framework"
+      ],
+      "popular": false
+    },
+    "date": "2026-04-16T23:00:00.000Z",
+    "time": "11:00 AM",
+    "customer": {
+      "name": "soyemi mujeb",
+      "email": "soyemimujeeb1@gmail.com",
+      "phone": "+2347077406319",
+      "details": "qwertyuio"
+    },
+    "paymentStatus": "paid",
+    "status": "completed",
+    "createdAt": "2026-04-11T19:30:20.521Z",
+    "updatedAt": "2026-04-11T19:54:01.810Z"
+  },
+  {
+    "id": "25cf2369-47c3-4515-9444-cd549d9d9f98",
+    "service": {
+      "id": "career-consultation",
+      "name": "Career Consultation",
+      "duration": "30 mins",
+      "price": 45,
+      "icon": "Compass",
+      "shortDesc": "Clarity on your next career move",
+      "description": "Feeling lost or stuck? This one-on-one session helps you map out a clear path forward. We'll assess your current situation, identify your strengths, and build a personalized strategy to help you land where you want to be.",
+      "highlights": [
+        "Career assessment & gap analysis",
+        "Personalized action plan",
+        "Industry-specific guidance",
+        "Goal-setting framework"
+      ],
+      "popular": false
+    },
+    "date": "2026-04-16T23:00:00.000Z",
+    "time": "12:00 PM",
+    "customer": {
+      "name": "soyemi mujeb",
+      "email": "soyemimujeeb1@gmail.com",
+      "phone": "+2347077406319",
+      "details": "i am a boy "
+    },
+    "paymentStatus": "paid",
+    "status": "confirmed",
+    "createdAt": "2026-04-11T19:59:33.003Z",
+    "updatedAt": "2026-04-11T19:59:33.005Z"
+  },
+  {
+    "id": "a1adafd9-02ed-46e2-a450-58b96506c8d3",
+    "service": {
+      "id": "interview-prep",
+      "name": "Interview Preparation",
+      "duration": "1 hr",
+      "price": 70,
+      "icon": "Target",
+      "shortDesc": "Walk in confident, walk out with the offer",
+      "description": "Interviews are a skill you can learn. In this deep-dive session, we'll run mock interviews, break down the STAR method, and coach you on how to handle tough questions, salary negotiations, and closing strong.",
+      "highlights": [
+        "Live mock interview session",
+        "STAR method coaching",
+        "Tough question strategies",
+        "Salary negotiation tactics"
+      ],
+      "popular": true
+    },
+    "date": "2026-04-16T23:00:00.000Z",
+    "time": "2:00 PM",
+    "customer": {
+      "name": "olamiji",
+      "email": "m@mail.com",
+      "phone": "+23412345678",
+      "details": "qwert"
+    },
+    "paymentStatus": "paid",
+    "status": "confirmed",
+    "createdAt": "2026-04-11T20:00:56.065Z",
+    "updatedAt": "2026-04-11T20:00:56.065Z"
+  },
+  {
+    "id": "c9f55205-001c-4594-b239-2158a31633e7",
+    "service": {
+      "id": "career-consultation",
+      "name": "Career Consultation",
+      "duration": "30 mins",
+      "price": 45,
+      "icon": "Compass",
+      "shortDesc": "Clarity on your next career move",
+      "description": "Feeling lost or stuck? This one-on-one session helps you map out a clear path forward. We'll assess your current situation, identify your strengths, and build a personalized strategy to help you land where you want to be.",
+      "highlights": [
+        "Career assessment & gap analysis",
+        "Personalized action plan",
+        "Industry-specific guidance",
+        "Goal-setting framework"
+      ],
+      "popular": false
+    },
+    "date": "2026-04-16T23:00:00.000Z",
+    "time": "1:00 PM",
+    "customer": {
+      "name": "soyemi mujeb",
+      "email": "soyemimujeeb1@gmail.com",
+      "phone": "+2347077406319",
+      "details": "gjb ouib"
+    },
+    "paymentStatus": "paid",
+    "status": "confirmed",
+    "createdAt": "2026-04-11T20:06:26.178Z",
+    "updatedAt": "2026-04-11T20:06:26.179Z"
+  },
+  {
+    "id": "74c2a039-a441-4646-a66b-e9b83fb51551",
+    "service": {
+      "id": "career-consultation",
+      "name": "Career Consultation",
+      "duration": "30 mins",
+      "price": 45,
+      "icon": "Compass",
+      "shortDesc": "Clarity on your next career move",
+      "description": "Feeling lost or stuck? This one-on-one session helps you map out a clear path forward. We'll assess your current situation, identify your strengths, and build a personalized strategy to help you land where you want to be.",
+      "highlights": [
+        "Career assessment & gap analysis",
+        "Personalized action plan",
+        "Industry-specific guidance",
+        "Goal-setting framework"
+      ],
+      "popular": false
+    },
+    "date": "2026-04-15T23:00:00.000Z",
+    "time": "6:30 PM",
+    "customer": {
+      "name": "manny",
+      "email": "m@mail.com",
+      "phone": "+23412345678",
+      "details": "jdycvugjh k"
+    },
+    "paymentStatus": "paid",
+    "status": "confirmed",
+    "createdAt": "2026-04-12T17:50:05.612Z",
+    "updatedAt": "2026-04-12T17:50:05.613Z"
+  },
+  {
+    "id": "2443c06a-2620-4b19-9963-35f9bdd6c5b3",
+    "service": {
+      "id": "career-consultation",
+      "name": "Career Consultation",
+      "duration": "30 mins",
+      "price": 45,
+      "icon": "Compass",
+      "shortDesc": "Clarity on your next career move",
+      "description": "Feeling lost or stuck? This one-on-one session helps you map out a clear path forward. We'll assess your current situation, identify your strengths, and build a personalized strategy to help you land where you want to be.",
+      "highlights": [
+        "Career assessment & gap analysis",
+        "Personalized action plan",
+        "Industry-specific guidance",
+        "Goal-setting framework"
+      ],
+      "popular": false
+    },
+    "date": "2026-04-17T23:00:00.000Z",
+    "time": "11:00 AM",
+    "customer": {
+      "name": "manny",
+      "email": "sandrakikch@gmail.com",
+      "phone": "+23412345678",
+      "details": "i am  a boy\n"
+    },
+    "paymentStatus": "paid",
+    "status": "confirmed",
+    "createdAt": "2026-04-12T21:57:28.446Z",
+    "updatedAt": "2026-04-12T22:01:27.509Z"
+  }
+]
