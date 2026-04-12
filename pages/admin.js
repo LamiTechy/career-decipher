@@ -4,13 +4,13 @@ import toast from "react-hot-toast";
 import { Lock, CalendarDays, CheckCircle2, DollarSign, Clock, Inbox, X, Send } from "lucide-react";
 
 export async function getServerSideProps() {
-  const { getBookings } = await import("../lib/bookings");
-  const bookings = getBookings();
-  return {
-    props: {
-      initialBookings: bookings.reverse(), // newest first
-    },
-  };
+  try {
+    const { default: sql } = await import("../lib/db");
+    const bookings = await sql`SELECT * FROM bookings ORDER BY created_at DESC`;
+    return { props: { initialBookings: bookings } };
+  } catch {
+    return { props: { initialBookings: [] } };
+  }
 }
 
 const STATUS_STYLES = {
