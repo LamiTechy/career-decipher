@@ -30,12 +30,19 @@ export default function ServiceBooking() {
 
   const serviceData = {
     name: detailedService?.name || mainService?.name,
+    description: detailedService?.description || mainService?.description,
+    shortDesc: detailedService?.shortDesc || mainService?.shortDesc,
     price: detailedService?.price ?? mainService?.price,
     duration: detailedService?.duration || mainService?.duration,
+    highlights: detailedService?.highlights || mainService?.highlights || [],
+    includes: mainService?.includes || detailedService?.highlights || [],
+    benefits: mainService?.benefits || [],
+    faq: mainService?.faq || [],
+    caseStudies: mainService?.caseStudies || [],
     slug: mainService?.slug || detailedService?.id,
   };
 
-  const [step, setStep] = useState(2);
+  const [step, setStep] = useState(1);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [form, setForm] = useState({ name: "", email: "", phone: "", details: "" });
@@ -155,6 +162,51 @@ export default function ServiceBooking() {
                   </div>
                 );
               })}
+            </div>
+          )}
+
+          {/* STEP 1: Service Overview */}
+          {step === 1 && (
+            <div className="bg-white rounded-2xl border border-cream-200 p-8">
+              <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+                <div>
+                  <h2 className="font-display text-2xl font-bold text-slate-850 mb-3">{serviceData.name}</h2>
+                  <p className="text-slate-700 mb-6">{serviceData.description}</p>
+                </div>
+                <div className="rounded-2xl bg-cream-50 border border-cream-200 px-5 py-4 text-center">
+                  <p className="text-xs uppercase tracking-[0.24em] text-slate-500 mb-2">Starting at</p>
+                  <p className="text-3xl font-semibold text-forest-600">${serviceData.price}</p>
+                </div>
+              </div>
+
+              {serviceData.highlights.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="font-semibold text-slate-850 mb-3">Highlights</h3>
+                  <div className="grid gap-3">
+                    {serviceData.highlights.map((item) => (
+                      <div key={item} className="rounded-2xl bg-cream-50 p-4 border border-cream-200 text-slate-700">
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {serviceData.includes.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="font-semibold text-slate-850 mb-3">What’s included</h3>
+                  <ul className="grid gap-2 text-slate-700">
+                    {serviceData.includes.map((item) => (
+                      <li key={item} className="rounded-2xl bg-cream-50 p-3 border border-cream-200">{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="rounded-2xl bg-cream-50 p-6 border border-cream-200">
+                <p className="font-semibold text-slate-850 mb-2">Ready to book?</p>
+                <p className="text-slate-700 text-sm">Continue to appointment selection and fill your details on the next screen.</p>
+              </div>
             </div>
           )}
 

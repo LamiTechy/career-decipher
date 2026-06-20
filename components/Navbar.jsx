@@ -88,7 +88,7 @@ export default function Navbar() {
                   onClick={() => setServicesDropdown(false)}
                   className="block px-4 py-2.5 text-sm text-forest-600 hover:bg-cream-50 transition-colors border-b border-cream-200"
                 >
-                  View All Services
+                  Career Consultation
                 </Link>
                 {mainServices.slice(1).map((service) => (
                   <Link
@@ -103,13 +103,6 @@ export default function Navbar() {
               </div>
             )}
           </div>
-
-          <Link
-            href="/services"
-            className="ml-3 px-5 py-2.5 bg-forest-500 hover:bg-forest-600 text-white rounded-lg text-sm font-semibold transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
-          >
-            Book a Session
-          </Link>
         </div>
 
         {/* Mobile toggle */}
