@@ -140,7 +140,7 @@ export default function Navbar() {
             onClick={() => setMobileOpen(false)}
             className="px-4 py-3 rounded-lg text-sm text-forest-600 hover:bg-cream-50 transition-colors border-t border-cream-200 mt-2"
           >
-            View All Services
+           Career Consultation
           </Link>
           {mainServices.slice(1).map((service) => (
             <Link
