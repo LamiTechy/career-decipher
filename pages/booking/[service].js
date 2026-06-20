@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
-import { ArrowLeft, CheckCircle2, AlertTriangle, ShieldCheck, Check } from "lucide-react";
+import { ArrowLeft, CheckCircle2, ShieldCheck, Check } from "lucide-react";
 import { mainServices } from "../../data/mainServices";
 import { services as detailedServices } from "../../data/services";
 
@@ -47,9 +47,41 @@ export default function ServiceBooking() {
   const [selectedTime, setSelectedTime] = useState(null);
   const [form, setForm] = useState({ name: "", email: "", phone: "", details: "" });
   const [paymentStatus, setPaymentStatus] = useState(null);
+  const [paymentError, setPaymentError] = useState(null);
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [paymentGateway, setPaymentGateway] = useState("paystack");
+  const hasVerifiedSession = useRef(false);
+
+  const BOOKING_STATE_KEY = "career_decipher_booking_state";
+
+  const saveBookingState = (state) => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(BOOKING_STATE_KEY, JSON.stringify(state));
+    } catch (error) {
+      console.warn("Unable to save booking state", error);
+    }
+  };
+
+  const loadBookingState = () => {
+    if (typeof window === "undefined") return null;
+    try {
+      const raw = window.localStorage.getItem(BOOKING_STATE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (error) {
+      console.warn("Unable to load booking state", error);
+      return null;
+    }
+  };
+
+  const clearBookingState = () => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.removeItem(BOOKING_STATE_KEY);
+    } catch (error) {
+      console.warn("Unable to clear booking state", error);
+    }
+  };
 
   if (!router.isReady || !serviceData.name) {
     return (
@@ -79,13 +111,86 @@ export default function ServiceBooking() {
     return true;
   };
 
-  const availabilityLabel = selectedDate
-    ? isWeekend(selectedDate)
-      ? "Available times: Saturday & Sunday, 9:00 AM – 6:00 PM"
-      : "Available times: Monday – Friday, 4:30 PM – 7:00 PM"
-    : "Select a date to see available times";
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
 
-  const handleConfirm = async () => {
+  const handlePayment = async () => {
+    if (!form.name.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      toast.error("Please complete your name and email before paying.");
+      setStep(3);
+      return;
+    }
+
+    saveBookingState({
+      service: serviceData,
+      selectedDate: selectedDate?.toISOString(),
+      selectedTime,
+      customer: form,
+    });
+
+    setLoading(true);
+    setPaymentError(null);
+
+    try {
+      const amount = Math.round(serviceData.price * 100);
+      const successUrl = `${origin}/booking/${service}?sessionId={CHECKOUT_SESSION_ID}`;
+      const cancelUrl = `${origin}/booking/${service}`;
+
+      const res = await fetch("/api/stripe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email,
+          name: serviceData.name,
+          phone: form.phone,
+          amount,
+          currency: "USD",
+          successUrl,
+          cancelUrl,
+        }),
+      });
+
+      const data = await res.json();
+      if (!data.status) {
+        throw new Error(data.message || "Unable to start payment.");
+      }
+
+      window.location.href = data.url;
+    } catch (err) {
+      setPaymentError(err.message || "Unable to start payment.");
+      toast.error(err.message || "Unable to start payment.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const verifyPayment = async (sessionId) => {
+    if (!sessionId) return;
+    setLoading(true);
+    setPaymentError(null);
+
+    try {
+      const res = await fetch("/api/stripe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ verify: true, sessionId }),
+      });
+      const data = await res.json();
+
+      if (!data.status) {
+        throw new Error(data.message || "Payment verification failed.");
+      }
+
+      setPaymentStatus("paid");
+      await completeBooking();
+    } catch (err) {
+      setPaymentError(err.message || "Unable to verify payment.");
+      toast.error(err.message || "Unable to verify payment.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const completeBooking = async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/bookings", {
@@ -105,10 +210,67 @@ export default function ServiceBooking() {
         setStep(5);
         toast.success("Booking confirmed! Check your email.");
       } else {
-        toast.error("Something went wrong. Please try again.");
+        throw new Error(data.error || "Something went wrong. Please try again.");
       }
-    } catch {
-      toast.error("Network error. Please try again.");
+    } catch (err) {
+      toast.error(err.message || "Unable to complete booking.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    const { sessionId } = router.query;
+
+    if (sessionId && !hasVerifiedSession.current) {
+      const savedState = loadBookingState();
+      if (savedState) {
+        setSelectedDate(savedState.selectedDate ? new Date(savedState.selectedDate) : null);
+        setSelectedTime(savedState.selectedTime || null);
+        setForm(savedState.customer || { name: "", email: "", phone: "", details: "" });
+      }
+      setStep(4);
+      verifyPayment(sessionId);
+      hasVerifiedSession.current = true;
+    }
+  }, [router.isReady, router.query]);
+
+  const availabilityLabel = selectedDate
+    ? isWeekend(selectedDate)
+      ? "Available times: Saturday & Sunday, 9:00 AM – 6:00 PM"
+      : "Available times: Monday – Friday, 4:30 PM – 7:00 PM"
+    : "Select a date to see available times";
+
+  const handleConfirm = async () => {
+    if (step === 4 && paymentStatus !== "paid") {
+      toast.error("Please complete payment before confirming your booking.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          service: serviceData,
+          date: selectedDate?.toISOString(),
+          time: selectedTime,
+          customer: form,
+          paymentStatus: paymentStatus || "pending",
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setBooking(data.booking);
+        setStep(5);
+        toast.success("Booking confirmed! Check your email.");
+      } else {
+        toast.error(data.error || "Something went wrong. Please try again.");
+      }
+    } catch (err) {
+      toast.error(err.message || "Network error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -334,14 +496,18 @@ export default function ServiceBooking() {
                   <div className="rounded-2xl border border-cream-200 bg-cream-50 p-5">
                     <p className="font-semibold text-slate-850 mb-2">Payment method</p>
                     <p className="text-sm text-slate-850/70">
-                      Payment processing will be integrated with Paystack or Stripe on next update.
+                      Choose Stripe to complete your payment using a secure checkout.
                     </p>
+                    {paymentError && (
+                      <p className="mt-3 text-sm text-red-600">{paymentError}</p>
+                    )}
                   </div>
                   <button
-                    onClick={() => setPaymentStatus("paid")}
-                    className="w-full py-4 bg-forest-500 hover:bg-forest-600 text-white rounded-xl font-semibold transition-all"
+                    onClick={() => handlePayment("stripe")}
+                    disabled={loading}
+                    className="w-full py-4 bg-forest-500 hover:bg-forest-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-all"
                   >
-                    Continue to Payment
+                    {loading ? "Redirecting to payment…" : "Pay with Stripe"}
                   </button>
                 </div>
               )}

@@ -80,18 +80,18 @@ export default function Home() {
 
             <div className="flex flex-wrap gap-4">
               <Link
-                href="/services/career-consultation"
+                href="/services"
                 className="inline-flex items-center gap-2 rounded-full bg-forest-500 px-8 py-4 text-white text-base font-semibold shadow-lg shadow-forest-500/10 transition hover:bg-forest-600"
               >
-                Book a Strategy Call
+                Book a Strategy Call <ArrowRight className="w-4 h-4" />
               </Link>
-              <Link
+              {/* <Link
                 href="/services"
                 className="inline-flex items-center gap-2 rounded-full border border-cream-200 bg-white px-8 py-4 text-slate-900 font-semibold transition hover:bg-cream-100"
               >
                 View Services
                 <ArrowRight className="w-4 h-4" />
-              </Link>
+              </Link> */}
             </div>
           </div>
 
@@ -122,7 +122,7 @@ export default function Home() {
             {offerings.map((item) => (
               <Link
                 key={item.slug}
-                href={`/services/${item.slug}`}
+                href={item.slug === "career-consultation" ? "/services" : `/services/${item.slug}`}
                 className="rounded-[2rem] border border-cream-200 bg-cream-50 p-8 shadow-sm transition hover:shadow-lg hover:border-forest-300 group"
               >
                 <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-forest-700 group-hover:scale-110 transition-transform">
@@ -215,7 +215,7 @@ export default function Home() {
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
-              href="/services/career-consultation"
+              href="/services"
               className="inline-flex items-center gap-2 rounded-full bg-gold-400 px-8 py-4 text-slate-900 font-semibold transition hover:bg-gold-300"
             >
               Book a Service

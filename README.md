@@ -7,15 +7,18 @@ A modern, full-stack career consulting website built with **Next.js 14**, **Tail
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js 18+ installed
 - npm or yarn
 
 ### 1. Install dependencies
+
 ```bash
 npm install
 ```
 
 ### 2. Start the development server
+
 ```bash
 npm run dev
 ```
@@ -23,6 +26,7 @@ npm run dev
 Visit: **http://localhost:3000**
 
 ### 3. Build for production
+
 ```bash
 npm run build
 npm start
@@ -58,12 +62,12 @@ career-decipher/
 
 ## 📄 Pages Overview
 
-| Page | URL | Description |
-|------|-----|-------------|
-| Homepage | `/` | Landing page with hero, services preview, testimonials |
-| Services | `/services` | Full services grid with pricing, FAQ |
-| Book | `/book` | 4-step booking: service → date/time → info → payment |
-| Admin | `/admin` | Dashboard with booking list, stats, status management |
+| Page     | URL         | Description                                            |
+| -------- | ----------- | ------------------------------------------------------ |
+| Homepage | `/`         | Landing page with hero, services preview, testimonials |
+| Services | `/services` | Full services grid with pricing, FAQ                   |
+| Book     | `/book`     | 4-step booking: service → date/time → info → payment   |
+| Admin    | `/admin`    | Dashboard with booking list, stats, status management  |
 
 ---
 
@@ -72,12 +76,14 @@ career-decipher/
 The booking system includes a **Stripe-style simulated payment UI**.
 
 ### Test Cards:
-| Card Number | Result |
-|------------|--------|
+
+| Card Number           | Result              |
+| --------------------- | ------------------- |
 | `4242 4242 4242 4242` | ✅ Payment succeeds |
-| `4000 0000 0000 0002` | ❌ Card declined |
+| `4000 0000 0000 0002` | ❌ Card declined    |
 
 > **Note:** No real payments are processed. To integrate real Stripe:
+>
 > 1. `npm install stripe @stripe/stripe-js @stripe/react-stripe-js`
 > 2. Add `STRIPE_SECRET_KEY` and `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` to `.env.local`
 > 3. Replace the mock payment handler in `pages/book.js` with Stripe's PaymentElement
@@ -91,6 +97,7 @@ Visit `/admin` and enter the admin key: **`admin123`**
 Leave the field blank to enter directly in development.
 
 **Admin Features:**
+
 - View all bookings with search & filter
 - Update booking status: confirmed / pending / completed / cancelled
 - Revenue stats and booking counts
@@ -116,43 +123,43 @@ Email confirmation is currently **mocked** (logged to console). To enable real e
 
 ## 🎨 Design System
 
-| Token | Value |
-|-------|-------|
-| Primary | `#3D7A55` (Forest Green) |
-| Accent | `#D4A843` (Gold) |
-| Background | `#FDFAF5` (Warm Cream) |
-| Dark | `#0F1720` |
+| Token        | Value                           |
+| ------------ | ------------------------------- |
+| Primary      | `#3D7A55` (Forest Green)        |
+| Accent       | `#D4A843` (Gold)                |
+| Background   | `#FDFAF5` (Warm Cream)          |
+| Dark         | `#0F1720`                       |
 | Display Font | Playfair Display (Google Fonts) |
-| Body Font | DM Sans (Google Fonts) |
+| Body Font    | DM Sans (Google Fonts)          |
 
 ---
 
 ## 🛠 Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Next.js 14 + React 18 |
-| Styling | Tailwind CSS v3 |
+| Layer      | Technology                           |
+| ---------- | ------------------------------------ |
+| Frontend   | Next.js 14 + React 18                |
+| Styling    | Tailwind CSS v3                      |
 | Animations | CSS keyframes + IntersectionObserver |
-| Calendar | react-calendar |
-| Toasts | react-hot-toast |
-| Database | JSON file (`data/bookings.json`) |
-| API | Next.js API Routes |
+| Calendar   | react-calendar                       |
+| Toasts     | react-hot-toast                      |
+| Database   | JSON file (`data/bookings.json`)     |
+| API        | Next.js API Routes                   |
 
 ---
 
 ## 📦 Services & Pricing
 
-| Service | Duration | Price |
-|---------|----------|-------|
-| Career Consultation | 30 mins | $45 |
-| Resume Review | 30 mins | $45 |
-| Resume & Cover Letter Review | 1 hr | $70 |
-| Cover Letter Review | 30 mins | $45 |
-| Interview Preparation | 1 hr | $70 |
-| LinkedIn Optimization | Custom | Custom |
-| On-the-Job Mentorship | 1 hr | $120 |
-| Bundle Package | 5 hrs | $250 |
+| Service                      | Duration | Price  |
+| ---------------------------- | -------- | ------ |
+| Career Consultation          | 30 mins  | $45    |
+| Resume Review                | 30 mins  | $45    |
+| Resume & Cover Letter Review | 1 hr     | $70    |
+| Cover Letter Review          | 30 mins  | $45    |
+| Interview Preparation        | 1 hr     | $70    |
+| LinkedIn Optimization        | Custom   | Custom |
+| On-the-Job Mentorship        | 1 hr     | $120   |
+| Bundle Package               | 5 hrs    | $250   |
 
 ---
 
@@ -161,12 +168,7 @@ Email confirmation is currently **mocked** (logged to console). To enable real e
 Create a `.env.local` file for production:
 
 ```env
-# Paystack
-NEXT_PUBLIC_PAYSTACK_KEY=pk_test_...
-PAYSTACK_SECRET_KEY=sk_test_...
-NEXT_PUBLIC_USD_TO_NGN_RATE=1500
-
-# Stripe (when ready for real payments)
+# Stripe (for real payments)
 STRIPE_SECRET_KEY=sk_test_...
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
 
