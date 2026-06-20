@@ -168,16 +168,8 @@ export default function ServiceBooking() {
           {/* STEP 1: Service Overview */}
           {step === 1 && (
             <div className="bg-white rounded-2xl border border-cream-200 p-8">
-              <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-                <div>
-                  <h2 className="font-display text-2xl font-bold text-slate-850 mb-3">{serviceData.name}</h2>
-                  <p className="text-slate-700 mb-6">{serviceData.description}</p>
-                </div>
-                <div className="rounded-2xl bg-cream-50 border border-cream-200 px-5 py-4 text-center">
-                  <p className="text-xs uppercase tracking-[0.24em] text-slate-500 mb-2">Starting at</p>
-                  <p className="text-3xl font-semibold text-forest-600">${serviceData.price}</p>
-                </div>
-              </div>
+              <h2 className="font-display text-2xl font-bold text-slate-850 mb-3">{serviceData.name}</h2>
+              <p className="text-slate-700 mb-6">{serviceData.description}</p>
 
               {serviceData.highlights.length > 0 && (
                 <div className="mb-6">

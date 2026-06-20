@@ -80,16 +80,16 @@ export default function Home() {
 
             <div className="flex flex-wrap gap-4">
               <Link
-                href="/services"
+                href="/services/career-consultation"
                 className="inline-flex items-center gap-2 rounded-full bg-forest-500 px-8 py-4 text-white text-base font-semibold shadow-lg shadow-forest-500/10 transition hover:bg-forest-600"
               >
-                View Services
+                Book a Strategy Call
               </Link>
               <Link
                 href="/services"
                 className="inline-flex items-center gap-2 rounded-full border border-cream-200 bg-white px-8 py-4 text-slate-900 font-semibold transition hover:bg-cream-100"
               >
-                Browse services
+                View Services
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
