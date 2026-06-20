@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { ChevronDown } from "lucide-react";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [servicesDropdown, setServicesDropdown] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -13,10 +15,14 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const mainServices = [
+    { label: "Career Consultation", href: "/booking/career-consultation" },
+    { label: "Brand Collaboration", href: "/booking/brand-collaboration" },
+    { label: "General Consultation", href: "/booking/general-consultation" },
+  ];
+
   const links = [
     { href: "/", label: "Home" },
-    { href: "/services", label: "Services" },
-    { href: "/book", label: "Book Now" },
   ];
 
   const isActive = (href) => router.pathname === href;
@@ -46,7 +52,7 @@ export default function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-1">
-          {links.slice(0, 3).map((link) => (
+          {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -59,8 +65,47 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+
+          {/* Services Dropdown */}
+          <div className="relative group">
+            <button
+              onMouseEnter={() => setServicesDropdown(true)}
+              onMouseLeave={() => setServicesDropdown(false)}
+              className="px-4 py-2 rounded-lg text-sm font-medium text-slate-850 hover:bg-cream-100 hover:text-forest-600 transition-all duration-200 flex items-center gap-1"
+            >
+              Services
+              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${servicesDropdown ? "rotate-180" : ""}`} />
+            </button>
+
+            {servicesDropdown && (
+              <div
+                onMouseEnter={() => setServicesDropdown(true)}
+                onMouseLeave={() => setServicesDropdown(false)}
+                className="absolute top-full left-0 mt-1 w-56 bg-white rounded-xl shadow-lg border border-cream-200 py-2 z-50"
+              >
+                <Link
+                  href="/services"
+                  onClick={() => setServicesDropdown(false)}
+                  className="block px-4 py-2.5 text-sm text-forest-600 hover:bg-cream-50 transition-colors border-b border-cream-200"
+                >
+                  View All Services
+                </Link>
+                {mainServices.slice(1).map((service) => (
+                  <Link
+                    key={service.href}
+                    href={service.href}
+                    onClick={() => setServicesDropdown(false)}
+                    className="block px-4 py-2.5 text-sm text-slate-850 hover:bg-cream-50 hover:text-forest-600 transition-colors"
+                  >
+                    {service.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
           <Link
-            href="/book"
+            href="/services"
             className="ml-3 px-5 py-2.5 bg-forest-500 hover:bg-forest-600 text-white rounded-lg text-sm font-semibold transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
           >
             Book a Session
@@ -95,6 +140,23 @@ export default function Navbar() {
               }`}
             >
               {link.label}
+            </Link>
+          ))}
+          <Link
+            href="/services"
+            onClick={() => setMobileOpen(false)}
+            className="px-4 py-3 rounded-lg text-sm text-forest-600 hover:bg-cream-50 transition-colors border-t border-cream-200 mt-2"
+          >
+            View All Services
+          </Link>
+          {mainServices.slice(1).map((service) => (
+            <Link
+              key={service.href}
+              href={service.href}
+              onClick={() => setMobileOpen(false)}
+              className="px-4 py-3 rounded-lg text-sm text-slate-850 hover:bg-cream-50 transition-colors"
+            >
+              {service.label}
             </Link>
           ))}
         </div>

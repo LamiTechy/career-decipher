@@ -40,7 +40,7 @@ export default function Footer() {
             <ul className="space-y-2">
               {[
                 { label: "Home", href: "/" },
-                { label: "Book a Session", href: "/book" },
+                { label: "Book a Session", href: "/services" },
               ].map((l) => (
                 <li key={l.href}>
                   <Link href={l.href} className="text-cream-200/70 hover:text-cream-100 text-sm transition-colors">

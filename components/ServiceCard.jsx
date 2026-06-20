@@ -81,7 +81,7 @@ export default function ServiceCard({ service, compact = false }) {
           )}
         </div>
         <Link
-          href={`/book?service=${service.id}`}
+          href={`/booking/${service.id}`}
           className="px-5 py-2.5 bg-forest-500 hover:bg-forest-600 text-white rounded-xl text-sm font-semibold transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
         >
           Book Now

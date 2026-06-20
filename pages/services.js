@@ -47,7 +47,7 @@ export default function Services() {
           <p className="text-white/70 text-lg mb-8 max-w-2xl mx-auto">
             Get everything: resume, cover letter, LinkedIn, career strategy, interview prep, and 30-day follow-up email support. Save $100+ compared to individual sessions.
           </p>
-          <Link href="/book?service=bundle-package" className="inline-flex items-center gap-2 px-10 py-4 bg-gold-400 hover:bg-gold-500 text-white rounded-xl font-bold text-lg transition-all duration-200 hover:shadow-xl hover:-translate-y-1">
+          <Link href="/booking/bundle-package" className="inline-flex items-center gap-2 px-10 py-4 bg-gold-400 hover:bg-gold-500 text-white rounded-xl font-bold text-lg transition-all duration-200 hover:shadow-xl hover:-translate-y-1">
             Get the Bundle →
           </Link>
         </div>
