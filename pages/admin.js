@@ -138,7 +138,7 @@ export default function Admin({ initialBookings }) {
   return (
     <>
       <Head>
-        <title>Admin Panel – Career Decipher</title>
+        <title>Admin Panel – Hanot Hub</title>
       </Head>
 
       <div className="min-h-screen bg-cream-50 pt-24 pb-16">

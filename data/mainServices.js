@@ -2,6 +2,7 @@ export const mainServices = [
   {
     id: "career-consultation",
     name: "Career Consultation",
+    displayName: "Career Consultation",
     slug: "career-consultation",
     icon: "Handshake",
     price: 150,
@@ -55,6 +56,7 @@ export const mainServices = [
   {
     id: "brand-collaboration",
     name: "Brand Collaboration",
+    displayName: "Partnership With LuvMattaz Tv",
     slug: "brand-collaboration",
     icon: "PenTool",
     price: 180,
@@ -108,6 +110,7 @@ export const mainServices = [
   {
     id: "general-consultation",
     name: "General Consultation",
+    displayName: "Ask Hanot",
     slug: "general-consultation",
     icon: "Compass",
     price: 120,
@@ -155,6 +158,120 @@ export const mainServices = [
         company: "Fortune 500",
         result: "Navigated career transition with confidence",
         quote: "The guidance helped me think through my next move clearly and build confidence in my decision."
+      }
+    ]
+  },
+  {
+    id: "shortlet",
+    name: "Short-let Apartment",
+    displayName: "Evet shortlet",
+    slug: "shortlet",
+    icon: "Home",
+    price: 90,
+    currency: "CAD",
+    duration: "Per night",
+    shortDesc: "2-bedroom ensuite shortlet apartment in Abeokuta with premium amenities.",
+    description:
+      "Stay in a comfortable 2-bedroom ensuite apartment in a quiet Abeokuta neighborhood. Perfect for short-term stays with reliable utilities, generator backup, and easy access to Abeokuta–Lagos Road.",
+    benefits: [
+      "Comfortable beds with fresh linens",
+      "En-suite bathroom with water heater",
+      "Fully equipped kitchen with refrigerator and microwave",
+      "Smart TV with cable entertainment",
+      "Generator backup power and borehole water supply",
+      "Free on-site parking in a quiet residential area"
+    ],
+    includes: [
+      "2 bedrooms ensuite with AC",
+      "Water heater and fresh towels",
+      "Fully furnished kitchen with gas cooker and utensils",
+      "Smart TV and DSTV / cable TV",
+      "Generator backup and borehole water",
+      "Refundable caution deposit of ₦50,000"
+    ],
+    faq: [
+      {
+        q: "What is included in the booking?",
+        a: "The apartment includes comfortable beds and linens, air conditioning, en-suite bathrooms, a fully equipped kitchen, smart TV with cable, generator backup, and continuous borehole water supply."
+      },
+      {
+        q: "What are the check-in and check-out times?",
+        a: "Check-in is at 2:00 PM and check-out is at 12:00 PM."
+      },
+      {
+        q: "Is there a deposit required?",
+        a: "Yes, a refundable caution deposit of ₦50,000 is required to secure your booking."
+      },
+      {
+        q: "Are there discounts for longer stays?",
+        a: "Yes, we offer discounts for stays longer than 3 days. Please contact us for specific pricing."
+      }
+    ],
+    media: [
+      {
+        type: "image",
+        src: "/shortlet/WhatsApp Image 2026-06-25 at 1.29.48 PM (1).jpeg",
+        alt: "Shortlet living area"
+      },
+      {
+        type: "image",
+        src: "/shortlet/WhatsApp Image 2026-06-25 at 1.29.48 PM (2).jpeg",
+        alt: "Shortlet kitchen"
+      },
+      {
+        type: "image",
+        src: "/shortlet/WhatsApp Image 2026-06-25 at 1.29.48 PM (3).jpeg",
+        alt: "Shortlet bedroom"
+      },
+      {
+        type: "image",
+        src: "/shortlet/WhatsApp Image 2026-06-25 at 1.29.48 PM (4).jpeg",
+        alt: "Shortlet bathroom"
+      },
+      {
+        type: "image",
+        src: "/shortlet/WhatsApp Image 2026-06-25 at 1.29.48 PM (5).jpeg",
+        alt: "Shortlet lounge"
+      },
+      {
+        type: "image",
+        src: "/shortlet/WhatsApp Image 2026-06-25 at 1.29.48 PM.jpeg",
+        alt: "Shortlet bedroom view"
+      },
+      {
+        type: "image",
+        src: "/shortlet/WhatsApp Image 2026-06-25 at 1.29.49 PM.jpeg",
+        alt: "Shortlet bathroom detail"
+      },
+      {
+        type: "video",
+        src: "https://drive.google.com/file/d/1PVzJeRMucy5cYmO24nA83uAX6GNL4vHK/preview"
+      }
+    ],
+    caseStudies: [
+      {
+        name: "Chioma O. - Digital Nomad",
+        company: "Remote Work",
+        result: "Found perfect apartment for 3-month stay",
+        quote: "The booking process was seamless and the apartment exceeded expectations. Great support team!"
+      },
+      {
+        name: "Tunde A. - Business Traveler",
+        company: "Corporate",
+        result: "Booked apartments for multiple business trips",
+        quote: "Reliable service, clean apartments, and excellent customer service. Highly recommended!"
+      }
+    ],
+    apartments: [
+      {
+        id: "abeokuta-2br-ensuite",
+        name: "2-Bedroom Ensuite Shortlet",
+        location: "Abeokuta",
+        bedrooms: 2,
+        price: 90,
+        currency: "CAD",
+        image: "🏡",
+        description: "Comfortable 2-bedroom ensuite apartment with generator backup, borehole water, smart TV, and full kitchen."
       }
     ]
   }

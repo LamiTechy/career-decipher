@@ -5,7 +5,7 @@ export default function NotFound() {
   return (
     <>
       <Head>
-        <title>Page Not Found – Career Decipher</title>
+        <title>Page Not Found – Hanot Hub</title>
       </Head>
       <div className="min-h-screen bg-cream-50 flex items-center justify-center px-6 pt-20">
         <div className="text-center max-w-md">

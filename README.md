@@ -1,4 +1,4 @@
-# 🧭 Career Decipher — Career Consulting Website
+# 🧭 Hanot Hub — Career Consulting Website
 
 A modern, full-stack career consulting website built with **Next.js 14**, **Tailwind CSS**, and a **JSON file-based database**.
 
@@ -199,4 +199,4 @@ vercel
 
 ---
 
-Built with ❤️ for Career Decipher
+Built with ❤️ for Hanot Hub

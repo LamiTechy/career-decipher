@@ -77,7 +77,7 @@ export default async function handler(req, res) {
     params.append("success_url", successUrl);
     params.append("cancel_url", cancelUrl);
     params.append("line_items[0][quantity]", "1");
-    params.append("line_items[0][price_data][currency]", (currency || "usd").toLowerCase());
+    params.append("line_items[0][price_data][currency]", (currency || "cad").toLowerCase());
     params.append("line_items[0][price_data][unit_amount]", String(rawAmount));
     params.append("line_items[0][price_data][product_data][name]", name);
     if (phone) {

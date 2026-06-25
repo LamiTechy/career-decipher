@@ -95,4 +95,23 @@ export const services = [
     highlights: ["5 hours of 1-on-1 coaching", "Resume + cover letter + LinkedIn", "Interview prep included", "30-day follow-up email support"],
     popular: true,
   },
+  {
+    id: "shortlet",
+    name: "Short-let Apartment",
+    duration: "Flexible",
+    price: 90,
+    currency: "CAD",
+    icon: "Home",
+    shortDesc: "Book comfortable short-term apartments for your stay.",
+    description:
+      "Find and book beautiful, fully furnished apartments for short-term stays. All apartments are vetted for comfort, safety, and convenience.",
+    highlights: [
+      "Fully furnished and equipped apartments",
+      "Flexible booking periods",
+      "Competitive pricing",
+      "24/7 customer support",
+      "Secure payment and guarantees",
+    ],
+    popular: false,
+  },
 ];

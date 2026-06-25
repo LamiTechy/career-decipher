@@ -10,12 +10,12 @@ export default function Footer() {
             <div className="flex items-center gap-3 mb-4">
               <div className="w-8 h-8 overflow-hidden rounded-lg">
                 <img
-                  src="/career-decipher-logo.svg"
-                  alt="Career Decipher logo"
+                  src="/hanot-hub-logo.svg"
+                  alt="Hanot Hub logo"
                   className="w-full h-full object-cover"
                 />
               </div>
-              <span className="font-display text-xl font-semibold">Career Decipher</span>
+              <span className="font-display text-xl font-semibold">Hanot Hub</span>
             </div>
             <p className="text-cream-200/70 text-sm leading-relaxed">
               Professional career consulting to help you find clarity, confidence, and your next big opportunity.
@@ -25,10 +25,17 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold text-gold-300 mb-4 text-sm uppercase tracking-widest">Services</h4>
             <ul className="space-y-2">
-              {["Career Consultation", "Resume Review", "Interview Prep", "LinkedIn Optimization", "Bundle Package"].map((s) => (
-                <li key={s}>
-                  <Link href="/services" className="text-cream-200/70 hover:text-cream-100 text-sm transition-colors">
-                    {s}
+              {[
+                { label: "Career Consultation", href: "/services/career-consultation" },
+                { label: "Resume Review", href: "/services/resume-review" },
+                { label: "Interview Prep", href: "/services/interview-prep" },
+                { label: "LinkedIn Optimization", href: "/services/linkedin-optimization" },
+                { label: "Bundle Package", href: "/services/bundle-package" },
+                { label: "Evet shortlet", href: "/services/shortlet" },
+              ].map((service) => (
+                <li key={service.href}>
+                  <Link href={service.href} className="text-cream-200/70 hover:text-cream-100 text-sm transition-colors">
+                    {service.label}
                   </Link>
                 </li>
               ))}
@@ -67,7 +74,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-cream-200/50 text-sm">© {new Date().getFullYear()} Career Decipher. All rights reserved.</p>
+          <p className="text-cream-200/50 text-sm">© {new Date().getFullYear()} Hanot Hub. All rights reserved.</p>
           <p className="text-cream-200/50 text-sm flex items-center gap-1">
             <Heart className="w-4 h-4 text-gold-400" />
             Built for career clarity

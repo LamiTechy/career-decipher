@@ -19,7 +19,13 @@ const WEEKEND_SLOTS = [
   "5:00 PM", "5:30 PM",
 ];
 
-const STEPS = ["Service", "Date & Time", "Your Info", "Payment", "Confirm"];
+const getSteps = (isShortlet) => {
+  const baseSteps = ["Service", "Date & Time", "Your Info", "Payment", "Confirm"];
+  if (isShortlet) {
+    return ["Service", "Select Apartment", "Check-in Date", "Your Info", "Payment", "Confirm"];
+  }
+  return baseSteps;
+};
 
 export default function ServiceBooking() {
   const router = useRouter();
@@ -30,10 +36,10 @@ export default function ServiceBooking() {
 
   const serviceData = {
     name: detailedService?.name || mainService?.name,
+    displayName: mainService?.displayName || detailedService?.name || mainService?.name,
     description: detailedService?.description || mainService?.description,
     shortDesc: detailedService?.shortDesc || mainService?.shortDesc,
-    price: detailedService?.price ?? mainService?.price,
-    duration: detailedService?.duration || mainService?.duration,
+    price: detailedService?.price ?? mainService?.price,    currency: detailedService?.currency || mainService?.currency || "CAD",    duration: detailedService?.duration || mainService?.duration,
     highlights: detailedService?.highlights || mainService?.highlights || [],
     includes: mainService?.includes || detailedService?.highlights || [],
     benefits: mainService?.benefits || [],
@@ -45,6 +51,9 @@ export default function ServiceBooking() {
   const [step, setStep] = useState(1);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
+  const [selectedApartment, setSelectedApartment] = useState(null);
+  const [apartments, setApartments] = useState([]);
+  const [apartmentAvailability, setApartmentAvailability] = useState({});
   const [form, setForm] = useState({ name: "", email: "", phone: "", details: "" });
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [paymentError, setPaymentError] = useState(null);
@@ -105,10 +114,44 @@ export default function ServiceBooking() {
   };
 
   const canProceed = () => {
-    if (step === 2) return !!selectedDate && !!selectedTime;
-    if (step === 3) return form.name.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
-    if (step === 4) return paymentStatus === "paid";
+    const isShortlet = service === "shortlet";
+    if (isShortlet) {
+      if (step === 2) return !!selectedApartment;
+      if (step === 3) return !!selectedDate;
+      if (step === 4) return form.name.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
+      if (step === 5) return paymentStatus === "paid";
+    } else {
+      if (step === 2) return !!selectedDate && !!selectedTime;
+      if (step === 3) return form.name.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
+      if (step === 4) return paymentStatus === "paid";
+    }
     return true;
+  };
+
+  const checkApartmentAvailability = async (apartmentId, date) => {
+    try {
+      const res = await fetch("/api/apartments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apartmentId, date: date.toISOString().split("T")[0] }),
+      });
+      const data = await res.json();
+      return data.available;
+    } catch (err) {
+      console.error("Availability check failed:", err);
+      return false;
+    }
+  };
+
+  const handleApartmentSelect = async (apartment) => {
+    if (selectedDate) {
+      const isAvailable = await checkApartmentAvailability(apartment.id, selectedDate);
+      if (!isAvailable) {
+        toast.error("This apartment is already booked for the selected date.");
+        return;
+      }
+    }
+    setSelectedApartment(apartment);
   };
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
@@ -120,18 +163,26 @@ export default function ServiceBooking() {
       return;
     }
 
+    if (service === "shortlet" && !selectedApartment) {
+      toast.error("Please select an apartment before paying.");
+      setStep(2);
+      return;
+    }
+
     saveBookingState({
       service: serviceData,
       selectedDate: selectedDate?.toISOString(),
       selectedTime,
       customer: form,
+      selectedApartment,
     });
 
     setLoading(true);
     setPaymentError(null);
 
     try {
-      const amount = Math.round(serviceData.price * 100);
+      const price = service === "shortlet" && selectedApartment ? selectedApartment.price : serviceData.price;
+      const amount = Math.round(price * 100);
       const successUrl = `${origin}/booking/${service}?sessionId={CHECKOUT_SESSION_ID}`;
       const cancelUrl = `${origin}/booking/${service}`;
 
@@ -143,7 +194,7 @@ export default function ServiceBooking() {
           name: serviceData.name,
           phone: form.phone,
           amount,
-          currency: "USD",
+          currency: (serviceData.currency || "CAD").toLowerCase(),
           successUrl,
           cancelUrl,
         }),
@@ -151,7 +202,7 @@ export default function ServiceBooking() {
 
       const data = await res.json();
       if (!data.status) {
-        throw new Error(data.message || "Unable to start payment.");
+        throw new Error(data.message || "Unable to initialize payment.");
       }
 
       window.location.href = data.url;
@@ -192,22 +243,30 @@ export default function ServiceBooking() {
 
   const completeBooking = async () => {
     setLoading(true);
+    const isShortlet = service === "shortlet";
+    
     try {
+      const bookingData = {
+        service: {
+          ...serviceData,
+          ...(isShortlet && selectedApartment && { apartment: selectedApartment }),
+        },
+        date: selectedDate?.toISOString(),
+        time: selectedTime || "N/A",
+        customer: form,
+        paymentStatus: "paid",
+      };
+
       const res = await fetch("/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          service: serviceData,
-          date: selectedDate?.toISOString(),
-          time: selectedTime,
-          customer: form,
-          paymentStatus: "paid",
-        }),
+        body: JSON.stringify(bookingData),
       });
       const data = await res.json();
       if (data.success) {
         setBooking(data.booking);
-        setStep(5);
+        const finalStep = isShortlet ? 6 : 5;
+        setStep(finalStep);
         toast.success("Booking confirmed! Check your email.");
       } else {
         throw new Error(data.error || "Something went wrong. Please try again.");
@@ -236,6 +295,21 @@ export default function ServiceBooking() {
     }
   }, [router.isReady, router.query]);
 
+  // Load apartments for shortlet service
+  useEffect(() => {
+    const isShortlet = service === "shortlet";
+    if (isShortlet) {
+      fetch("/api/apartments")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            setApartments(data.apartments);
+          }
+        })
+        .catch((err) => console.error("Failed to load apartments:", err));
+    }
+  }, [service]);
+
   const availabilityLabel = selectedDate
     ? isWeekend(selectedDate)
       ? "Available times: Saturday & Sunday, 9:00 AM – 6:00 PM"
@@ -243,37 +317,13 @@ export default function ServiceBooking() {
     : "Select a date to see available times";
 
   const handleConfirm = async () => {
-    if (step === 4 && paymentStatus !== "paid") {
+    const paymentStep = service === "shortlet" ? 5 : 4;
+    if (step === paymentStep && paymentStatus !== "paid") {
       toast.error("Please complete payment before confirming your booking.");
       return;
     }
 
-    setLoading(true);
-    try {
-      const res = await fetch("/api/bookings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          service: serviceData,
-          date: selectedDate?.toISOString(),
-          time: selectedTime,
-          customer: form,
-          paymentStatus: paymentStatus || "pending",
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setBooking(data.booking);
-        setStep(5);
-        toast.success("Booking confirmed! Check your email.");
-      } else {
-        toast.error(data.error || "Something went wrong. Please try again.");
-      }
-    } catch (err) {
-      toast.error(err.message || "Network error. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    await completeBooking();
   };
 
   const formatDate = (d) => d ? new Date(d).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" }) : "";
@@ -281,8 +331,8 @@ export default function ServiceBooking() {
   return (
     <>
       <Head>
-        <title>Book {serviceData.name} - Career Decipher</title>
-        <meta name="description" content={`Book your ${serviceData.name} session with Career Decipher`} />
+        <title>Book {serviceData.displayName} - Hanot Hub</title>
+        <meta name="description" content={`Book your ${serviceData.displayName} session with Hanot Hub`} />
       </Head>
 
       <section className="min-h-screen bg-cream-50 pt-24 pb-20">
@@ -298,9 +348,9 @@ export default function ServiceBooking() {
           </div>
 
           {/* Step indicator */}
-          {step < 5 && (
+          {step < (service === "shortlet" ? 6 : 5) && (
             <div className="flex items-center justify-center gap-2 mb-10 flex-wrap">
-              {STEPS.map((s, i) => {
+              {getSteps(service === "shortlet").map((s, i) => {
                 const num = i + 1;
                 const isActive = num === step;
                 const isDone = num < step;
@@ -320,7 +370,7 @@ export default function ServiceBooking() {
                       </span>
                       {s}
                     </div>
-                    {i < STEPS.length - 2 && <span className="text-cream-200 text-lg">→</span>}
+                    {i < getSteps(service === "shortlet").length - 2 && <span className="text-cream-200 text-lg">→</span>}
                   </div>
                 );
               })}
@@ -330,7 +380,7 @@ export default function ServiceBooking() {
           {/* STEP 1: Service Overview */}
           {step === 1 && (
             <div className="bg-white rounded-2xl border border-cream-200 p-8">
-              <h2 className="font-display text-2xl font-bold text-slate-850 mb-3">{serviceData.name}</h2>
+              <h2 className="font-display text-2xl font-bold text-slate-850 mb-3">{serviceData.displayName}</h2>
               <p className="text-slate-700 mb-6">{serviceData.description}</p>
 
               {serviceData.highlights.length > 0 && (
@@ -364,52 +414,94 @@ export default function ServiceBooking() {
             </div>
           )}
 
-          {/* STEP 2: Date & Time */}
-          {step === 2 && (
+          {/* STEP 2: Select Apartment (Shortlet only) */}
+          {service === "shortlet" && step === 2 && (
             <div className="bg-white rounded-2xl border border-cream-200 p-8">
-              <h2 className="font-display text-2xl font-bold text-slate-850 mb-2">Pick a Date & Time</h2>
-              <p className="text-slate-850/50 text-sm mb-6">All times shown in Eastern Time (EST)</p>
+              <h2 className="font-display text-2xl font-bold text-slate-850 mb-2">Select an Apartment</h2>
+              <p className="text-slate-850/50 text-sm mb-6">Choose your preferred apartment</p>
+              <div className="grid md:grid-cols-2 gap-6">
+                {apartments.map((apartment) => (
+                  <div
+                    key={apartment.id}
+                    onClick={() => handleApartmentSelect(apartment)}
+                    className={`p-6 rounded-2xl border-2 cursor-pointer transition-all ${
+                      selectedApartment?.id === apartment.id
+                        ? "border-forest-500 bg-forest-500/5"
+                        : "border-cream-200 hover:border-forest-400"
+                    }`}
+                  >
+                    <div className="text-4xl mb-3">{apartment.image}</div>
+                    <h3 className="font-semibold text-slate-850 mb-2">{apartment.name}</h3>
+                    <p className="text-sm text-slate-700 mb-3">{apartment.description}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-slate-600">{apartment.bedrooms}BR • {apartment.location}</span>
+                      <span className="font-bold text-forest-600">${apartment.price}/night</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* STEP 2/3: Date & Time */}
+          {step === (service === "shortlet" ? 3 : 2) && (
+            <div className="bg-white rounded-2xl border border-cream-200 p-8">
+              <h2 className="font-display text-2xl font-bold text-slate-850 mb-2">
+                {service === "shortlet" ? "Pick Your Check-in Date" : "Pick a Date & Time"}
+              </h2>
+              <p className="text-slate-850/50 text-sm mb-6">
+                {service === "shortlet" 
+                  ? "Select when you'd like to check in" 
+                  : "All times shown in Eastern Time (EST)"}
+              </p>
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
                   <p className="font-semibold text-slate-850 mb-3 text-sm">Select Date</p>
                   <div className="bg-cream-50 rounded-xl p-4">
                     <Calendar
-                      onChange={setSelectedDate}
+                      onChange={(date) => {
+                        setSelectedDate(date);
+                        if (service === "shortlet" && selectedApartment) {
+                          checkApartmentAvailability(selectedApartment.id, date);
+                        }
+                      }}
                       value={selectedDate}
                       minDate={new Date()}
                       tileDisabled={({ date }) => isDateInPast(date)}
                     />
                   </div>
                 </div>
-                <div>
-                  <p className="font-semibold text-slate-850 mb-3 text-sm">
-                    {availabilityLabel}
-                  </p>
-                  <div className="grid grid-cols-2 gap-2 max-h-72 overflow-y-auto pr-1">
-                    {getAvailableTimeSlots(selectedDate).map((t) => (
-                      <button
-                        key={t}
-                        onClick={() => setSelectedTime(t)}
-                        disabled={!selectedDate}
-                        className={`py-2.5 px-3 text-sm rounded-lg border font-medium transition-all ${
-                          selectedTime === t
-                            ? "border-forest-500 bg-forest-500 text-white"
-                            : !selectedDate
-                            ? "border-cream-200 text-slate-850/30 cursor-not-allowed"
-                            : "border-cream-200 hover:border-forest-400 text-slate-850 hover:bg-cream-50"
-                        }`}
-                      >
-                        {t}
-                      </button>
-                    ))}
+                {service !== "shortlet" && (
+                  <div>
+                    <p className="font-semibold text-slate-850 mb-3 text-sm">
+                      {availabilityLabel}
+                    </p>
+                    <div className="grid grid-cols-2 gap-2 max-h-72 overflow-y-auto pr-1">
+                      {getAvailableTimeSlots(selectedDate).map((t) => (
+                        <button
+                          key={t}
+                          onClick={() => setSelectedTime(t)}
+                          disabled={!selectedDate}
+                          className={`py-2.5 px-3 text-sm rounded-lg border font-medium transition-all ${
+                            selectedTime === t
+                              ? "border-forest-500 bg-forest-500 text-white"
+                              : !selectedDate
+                              ? "border-cream-200 text-slate-850/30 cursor-not-allowed"
+                              : "border-cream-200 hover:border-forest-400 text-slate-850 hover:bg-cream-50"
+                          }`}
+                        >
+                          {t}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           )}
 
-          {/* STEP 3: Contact Info */}
-          {step === 3 && (
+          {/* STEP 3/4: Contact Info */}
+          {step === (service === "shortlet" ? 4 : 3) && (
             <div className="bg-white rounded-2xl border border-cream-200 p-8">
               <h2 className="font-display text-2xl font-bold text-slate-850 mb-6">Your Information</h2>
               <div className="space-y-5">
@@ -461,8 +553,8 @@ export default function ServiceBooking() {
             </div>
           )}
 
-          {/* STEP 4: Payment */}
-          {step === 4 && (
+          {/* STEP 4/5: Payment */}
+          {step === (service === "shortlet" ? 5 : 4) && (
             <div className="bg-white rounded-2xl border border-cream-200 p-8">
               <h2 className="font-display text-2xl font-bold text-slate-850 mb-2">Payment</h2>
               <div className="flex items-center gap-2 text-xs text-slate-850/50 mb-6">
@@ -474,11 +566,21 @@ export default function ServiceBooking() {
                 <p className="text-sm font-semibold text-slate-850 mb-3">Order Summary</p>
                 <div className="flex justify-between items-center text-sm">
                   <div>
-                    <p className="font-medium text-slate-850">{serviceData.name}</p>
-                    <p className="text-slate-850/50 text-xs">{serviceData.duration} • {formatDate(selectedDate)} at {selectedTime}</p>
+                    <p className="font-medium text-slate-850">{serviceData.displayName}</p>
+                    {service === "shortlet" && selectedApartment && (
+                      <>
+                        <p className="text-xs text-slate-700 mt-1">{selectedApartment.name}</p>
+                        <p className="text-slate-850/50 text-xs">Check-in: {formatDate(selectedDate)}</p>
+                      </>
+                    )}
+                    {service !== "shortlet" && (
+                      <p className="text-slate-850/50 text-xs">{serviceData.duration} • {formatDate(selectedDate)} at {selectedTime}</p>
+                    )}
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-forest-600 text-lg">${serviceData.price}</p>
+                    <p className="font-bold text-forest-600 text-lg">
+                      ${selectedApartment?.price || serviceData.price}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -514,8 +616,8 @@ export default function ServiceBooking() {
             </div>
           )}
 
-          {/* STEP 5: Confirmation */}
-          {step === 5 && (
+          {/* STEP 5/6: Confirmation */}
+          {step === (service === "shortlet" ? 6 : 5) && (
             <div className="bg-white rounded-2xl border border-cream-200 p-10 text-center">
               <div className="w-20 h-20 bg-forest-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-forest-700">
                 <CheckCircle2 className="w-10 h-10" />
@@ -526,19 +628,35 @@ export default function ServiceBooking() {
               <div className="bg-cream-50 rounded-2xl p-6 text-left border border-cream-200 mb-8">
                 <h3 className="font-semibold text-slate-850 mb-4 text-sm uppercase tracking-wide">Booking Details</h3>
                 <div className="space-y-3">
-                  {[
-                    ["Service", serviceData.name],
-                    ["Date", formatDate(selectedDate)],
-                    ["Time", selectedTime],
-                    ["Duration", serviceData.duration],
-                    ["Amount Paid", `$${serviceData.price}`],
-                    ["Status", "Confirmed"],
-                  ].map(([label, value]) => (
-                    <div key={label} className="flex justify-between text-sm">
-                      <span className="text-slate-850/50">{label}</span>
-                      <span className="font-medium text-slate-850">{value}</span>
-                    </div>
-                  ))}
+                  {service === "shortlet" && selectedApartment ? (
+                    [
+                      ["Service", serviceData.displayName],
+                      ["Apartment", selectedApartment.name],
+                      ["Location", selectedApartment.location],
+                      ["Check-in Date", formatDate(selectedDate)],
+                      ["Price per Night", `$${selectedApartment.price}`],
+                      ["Status", "Confirmed"],
+                    ].map(([label, value]) => (
+                      <div key={label} className="flex justify-between text-sm">
+                        <span className="text-slate-850/50">{label}</span>
+                        <span className="font-medium text-slate-850">{value}</span>
+                      </div>
+                    ))
+                  ) : (
+                    [
+                      ["Service", serviceData.displayName],
+                      ["Date", formatDate(selectedDate)],
+                      ["Time", selectedTime],
+                      ["Duration", serviceData.duration],
+                      ["Amount Paid", `$${serviceData.price}`],
+                      ["Status", "Confirmed"],
+                    ].map(([label, value]) => (
+                      <div key={label} className="flex justify-between text-sm">
+                        <span className="text-slate-850/50">{label}</span>
+                        <span className="font-medium text-slate-850">{value}</span>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
 
@@ -549,7 +667,7 @@ export default function ServiceBooking() {
           )}
 
           {/* Navigation */}
-          {step < 5 && (
+          {step < (service === "shortlet" ? 6 : 5) && (
             <div className="flex justify-between mt-6">
               <button
                 onClick={() => setStep(step - 1)}
@@ -558,7 +676,7 @@ export default function ServiceBooking() {
               >
                 ← Back
               </button>
-              {step < 4 ? (
+              {step < (service === "shortlet" ? 5 : 4) ? (
                 <button
                   onClick={() => setStep(step + 1)}
                   disabled={!canProceed()}

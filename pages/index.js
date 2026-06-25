@@ -1,16 +1,18 @@
 import Head from "next/head";
 import Link from "next/link";
-import { Sparkles, Handshake, PenTool, Compass, ArrowRight } from "lucide-react";
+import { Sparkles, Handshake, PenTool, Compass, Home as HomeIcon, ArrowRight } from "lucide-react";
 import { mainServices } from "../data/mainServices";
 
 const offerings = mainServices.map((service) => ({
-  title: service.name,
+  title: service.displayName || service.name,
   description: service.shortDesc,
   icon:
     service.icon === "Handshake" ? (
       <Handshake className="w-7 h-7 text-gold-400" />
     ) : service.icon === "PenTool" ? (
       <PenTool className="w-7 h-7 text-forest-500" />
+    ) : service.icon === "Home" ? (
+      <HomeIcon className="w-7 h-7 text-forest-500" />
     ) : (
       <Compass className="w-7 h-7 text-slate-850" />
     ),
@@ -54,7 +56,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Career Decipher - Warm Modern Career & Consultation</title>
+        <title>Hanot Hub - Warm Modern Career & Consultation</title>
         <meta
           name="description"
           content="Warm modern career consulting, brand collaboration and general consultation services with a friendly, polished experience."

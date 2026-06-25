@@ -8,7 +8,7 @@ export default function Services() {
   return (
     <>
       <Head>
-        <title>Services & Pricing – Career Decipher</title>
+        <title>Services & Pricing – Hanot Hub</title>
         <meta name="description" content="View all career consulting services and pricing. Resume review, interview prep, LinkedIn optimization, and more." />
       </Head>
 

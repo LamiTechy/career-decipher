@@ -8,6 +8,7 @@ import {
   Link2,
   Leaf,
   Package,
+  Home,
   Circle,
   Check,
 } from "lucide-react";
@@ -21,6 +22,7 @@ const ICON_MAP = {
   Link2,
   Leaf,
   Package,
+  Home,
 };
 
 export default function ServiceCard({ service, compact = false }) {
@@ -73,8 +75,10 @@ export default function ServiceCard({ service, compact = false }) {
         <div>
           {service.price ? (
             <div>
-              <span className="text-2xl font-display font-bold text-forest-600">${service.price}</span>
-              <span className="text-slate-850/50 text-xs ml-1">/ session</span>
+              <span className="text-2xl font-display font-bold text-forest-600">
+                {service.currency === "CAD" ? `CAD ${service.price}` : `$${service.price}`}
+              </span>
+              <span className="text-slate-850/50 text-xs ml-1">/ {service.duration?.toLowerCase().includes("per night") ? "night" : "session"}</span>
             </div>
           ) : (
             <span className="text-forest-600 font-semibold text-sm">Custom pricing</span>

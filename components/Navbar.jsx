@@ -19,6 +19,7 @@ export default function Navbar() {
     { label: "Career Consultation", href: "/booking/career-consultation" },
     { label: "Brand Collaboration", href: "/booking/brand-collaboration" },
     { label: "General Consultation", href: "/booking/general-consultation" },
+    { label: "Short-let Apartment", href: "/booking/shortlet" },
   ];
 
   const links = [
@@ -40,13 +41,13 @@ export default function Navbar() {
         <Link href="/" className="flex items-center gap-3 group">
           <div className="w-10 h-10 overflow-hidden rounded-lg transition-transform group-hover:scale-105">
             <img
-              src="/career-decipher-logo.svg"
-              alt="Career Decipher logo"
+              src="/hanot-hub-logo.svg"
+              alt="Hanot Hub logo"
               className="w-full h-full object-cover"
             />
           </div>
           <span className="font-display font-700 text-xl text-slate-850 tracking-tight">
-            Career <span className="text-forest-500">Decipher</span>
+            Hanot <span className="text-forest-500">Hub</span>
           </span>
         </Link>
 
