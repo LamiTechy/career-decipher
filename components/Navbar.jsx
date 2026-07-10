@@ -17,9 +17,9 @@ export default function Navbar() {
 
   const mainServices = [
     { label: "Career Consultation", href: "/booking/career-consultation" },
-    { label: "Brand Collaboration", href: "/booking/brand-collaboration" },
-    { label: "General Consultation", href: "/booking/general-consultation" },
-    { label: "Short-let Apartment", href: "/booking/shortlet" },
+    { label: "Brand Collaboration", href: "/services/brand-collaboration" },
+    { label: "General Consultation", href: "/services/general-consultation" },
+    { label: "Short-let Apartment", href: "/services/shortlet" },
   ];
 
   const links = [

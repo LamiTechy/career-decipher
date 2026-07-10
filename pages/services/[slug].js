@@ -59,14 +59,24 @@ export default function ServiceDetail() {
     );
   }
 
+  const showSuccessStories = false;
+
+  const priceLabel = slug === "brand-collaboration" || slug === "general-consultation" || slug === "shortlet" ? "Price" : "Investment";
+
+  const isPerNight = service.duration?.toLowerCase().includes("per night");
+
   const formattedPrice = service.price
     ? service.currency === "CAD"
-      ? `CAD ${service.price}`
-      : `$${service.price}`
+      ? isPerNight
+        ? `CAD ${service.price} / night`
+        : `CAD ${service.price}`
+      : isPerNight
+        ? `$${service.price} / night`
+        : `$${service.price}`
     : "Contact us";
 
-  const durationLabel = service.duration?.toLowerCase().includes("per night")
-    ? service.duration
+  const durationLabel = isPerNight
+    ? null
     : `${service.duration} session`;
 
   return (
@@ -226,7 +236,7 @@ export default function ServiceDetail() {
                   </div>
                 </div>
 
-                {service.caseStudies.length > 0 && (
+                {showSuccessStories && service.caseStudies.length > 0 && (
                   <div>
                     <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">Success Stories</h2>
                     <div className="grid gap-4">
@@ -270,9 +280,9 @@ export default function ServiceDetail() {
             <div className="lg:col-span-1">
               <div className="sticky top-28 rounded-3xl bg-white border border-cream-200 p-8 shadow-lg">
                 <div className="mb-8">
-                  <p className="text-sm uppercase tracking-[0.3em] text-forest-500 font-semibold">Investment</p>
+                  {priceLabel && <p className="text-sm uppercase tracking-[0.3em] text-forest-500 font-semibold">{priceLabel}</p>}
                   <p className="text-4xl font-bold text-slate-900 mt-2">{formattedPrice}</p>
-                  <p className="text-sm text-slate-600 mt-1">{durationLabel}</p>
+                  {durationLabel && <p className="text-sm text-slate-600 mt-1">{durationLabel}</p>}
                 </div>
 
                 <Link

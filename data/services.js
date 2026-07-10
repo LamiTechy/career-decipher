@@ -98,7 +98,7 @@ export const services = [
   {
     id: "shortlet",
     name: "Short-let Apartment",
-    duration: "Flexible",
+    duration: "Per night",
     price: 90,
     currency: "CAD",
     icon: "Home",

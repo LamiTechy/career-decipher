@@ -64,19 +64,18 @@ export default function Home() {
       </Head>
 
       <section className="min-h-screen bg-cream-50 pt-24">
-        <div className="mx-auto flex max-w-6xl flex-col gap-20 px-6 lg:grid lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16">
+        <div className="mx-auto flex max-w-6xl flex-col-reverse gap-12 px-6 lg:grid lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16">
           <div className="space-y-8">
-            <div className="inline-flex items-center gap-3 rounded-full bg-white/90 px-5 py-3 text-sm text-forest-700 shadow-sm border border-cream-200">
+            <div className="inline-flex items-center gap-3 rounded-full bg-white/90 px-5 py-3 text-sm text-forest-700 shadow-sm border border-cream-200 max-lg:hidden">
               <Sparkles className="w-4 h-4 text-gold-400" />
-              Warm modern consultation for career, collaboration, and brand growth.
+              Welcome
             </div>
-
             <div className="space-y-6">
               <h1 className="font-display text-5xl font-bold tracking-tight text-slate-900 sm:text-6xl">
-                Career clarity, brand collaboration, and consultation that feels polished and human.
+                Welcome! I'm so glad you're here.
               </h1>
               <p className="max-w-2xl text-lg leading-relaxed text-slate-700">
-                Build your next move with strategy designed for professionals, founders, and creative brands. It is career advice with a warm modern tone, practical next steps, and a refreshingly simple process.
+                Whether you are looking to decode your next major career move, collaborate on an impactful brand campaign, book a memorable stay, or simply connect one-on-one—you've landed in the right place.
               </p>
             </div>
 
@@ -85,33 +84,26 @@ export default function Home() {
                 href="/services"
                 className="inline-flex items-center gap-2 rounded-full bg-forest-500 px-8 py-4 text-white text-base font-semibold shadow-lg shadow-forest-500/10 transition hover:bg-forest-600"
               >
-                Book a Strategy Call <ArrowRight className="w-4 h-4" />
+                Explore Services <ArrowRight className="w-4 h-4" />
               </Link>
-              {/* <Link
-                href="/services"
-                className="inline-flex items-center gap-2 rounded-full border border-cream-200 bg-white px-8 py-4 text-slate-900 font-semibold transition hover:bg-cream-100"
-              >
-                View Services
-                <ArrowRight className="w-4 h-4" />
-              </Link> */}
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-cream-200 bg-white p-10 shadow-[0_30px_60px_rgba(62,44,14,0.08)]">
-            <p className="text-sm uppercase tracking-[0.3em] text-forest-500">Warm modern consultation</p>
-            <h2 className="mt-4 text-3xl font-semibold text-slate-900">What to expect from your first session</h2>
-            <ul className="mt-8 space-y-5">
-              {[
-                "A calm, focused conversation about your goals.",
-                "A tailored plan for career progress and collaboration.",
-                "Clear follow-up guidance so you keep moving forward.",
-              ].map((item) => (
-                <li key={item} className="flex gap-3 rounded-2xl bg-cream-50 p-4">
-                  <span className="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full bg-forest-500 text-white">+</span>
-                  <span className="text-slate-700 leading-relaxed">{item}</span>
-                </li>
-              ))}
-            </ul>
+          <div className="flex items-center justify-center">
+            <div className="w-full max-w-sm aspect-[3/4] overflow-hidden rounded-[2rem] shadow-[0_30px_60px_rgba(62,44,14,0.08)]">
+              <img
+                src="/WhatsApp_Image_2026-07-02_at_12.24.11_PM-removebg-preview.png"
+                alt="Hanot Hub"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-center lg:hidden">
+            <div className="inline-flex items-center gap-3 rounded-full bg-white/90 px-5 py-3 text-sm text-forest-700 shadow-sm border border-cream-200">
+              <Sparkles className="w-4 h-4 text-gold-400" />
+              Welcome
+            </div>
           </div>
         </div>
       </section>
