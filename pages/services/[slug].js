@@ -61,6 +61,8 @@ export default function ServiceDetail() {
 
   const showSuccessStories = false;
 
+  const isConnect = slug === "brand-collaboration";
+
   const priceLabel = slug === "brand-collaboration" || slug === "general-consultation" || slug === "shortlet" ? "Price" : "Investment";
 
   const isPerNight = service.duration?.toLowerCase().includes("per night");
@@ -280,16 +282,26 @@ export default function ServiceDetail() {
             <div className="lg:col-span-1">
               <div className="sticky top-28 rounded-3xl bg-white border border-cream-200 p-8 shadow-lg">
                 <div className="mb-8">
-                  {priceLabel && <p className="text-sm uppercase tracking-[0.3em] text-forest-500 font-semibold">{priceLabel}</p>}
-                  <p className="text-4xl font-bold text-slate-900 mt-2">{formattedPrice}</p>
-                  {durationLabel && <p className="text-sm text-slate-600 mt-1">{durationLabel}</p>}
+                  {isConnect ? (
+                    <>
+                      <p className="text-sm uppercase tracking-[0.3em] text-forest-500 font-semibold">Let's Connect</p>
+                      <p className="text-2xl font-bold text-slate-900 mt-2">Tell us about your brand</p>
+                      <p className="text-sm text-slate-600 mt-1">No payment needed — we'll reach out to you.</p>
+                    </>
+                  ) : (
+                    <>
+                      {priceLabel && <p className="text-sm uppercase tracking-[0.3em] text-forest-500 font-semibold">{priceLabel}</p>}
+                      <p className="text-4xl font-bold text-slate-900 mt-2">{formattedPrice}</p>
+                      {durationLabel && <p className="text-sm text-slate-600 mt-1">{durationLabel}</p>}
+                    </>
+                  )}
                 </div>
 
                 <Link
                   href={`/booking/${service.slug}`}
                   className="w-full flex items-center justify-center gap-2 rounded-full bg-forest-500 px-8 py-4 text-white text-base font-semibold shadow-lg shadow-forest-500/10 transition hover:bg-forest-600 mb-4"
                 >
-                  Book This Service
+                  {isConnect ? "Connect" : "Book This Service"}
                   <ArrowRight className="w-4 h-4" />
                 </Link>
 
@@ -297,13 +309,6 @@ export default function ServiceDetail() {
                   <MessageCircle className="w-4 h-4" />
                   Have Questions?
                 </button>
-
-                <div className="mt-8 p-4 rounded-2xl bg-cream-50 text-center">
-                  <p className="text-sm text-slate-700">
-                    <strong>30-day satisfaction guarantee</strong>
-                  </p>
-                  <p className="text-xs text-slate-600 mt-1">Not satisfied? Full refund within 30 days.</p>
-                </div>
               </div>
             </div>
           </div>
@@ -312,15 +317,19 @@ export default function ServiceDetail() {
 
       <section className="bg-forest-700 py-20">
         <div className="mx-auto max-w-4xl px-6 text-center text-white">
-          <h2 className="font-display text-3xl md:text-4xl font-bold mb-6">Ready to get started?</h2>
+          <h2 className="font-display text-3xl md:text-4xl font-bold mb-6">
+            {isConnect ? "Let's talk about your brand" : "Ready to get started?"}
+          </h2>
           <p className="text-lg text-white/80 mb-8">
-            Book your {service.name.toLowerCase()} session today and take the next step forward.
+            {isConnect
+              ? `Tell us about your brand and what you're looking for — no payment needed.`
+              : `Book your ${service.name.toLowerCase()} session today and take the next step forward.`}
           </p>
           <Link
             href={`/booking/${service.slug}`}
             className="inline-flex items-center gap-2 rounded-full bg-gold-400 px-8 py-4 text-slate-900 font-semibold transition hover:bg-gold-300"
           >
-            Secure Your Spot
+            {isConnect ? "Connect" : "Secure Your Spot"}
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

@@ -102,7 +102,7 @@ export default function Admin({ initialBookings }) {
   const stats = {
     total: bookings.length,
     confirmed: bookings.filter((b) => b.status === "confirmed").length,
-    revenue: bookings.filter((b) => b.status !== "cancelled").reduce((sum, b) => sum + (b.service?.price || 0), 0),
+    revenue: bookings.filter((b) => b.status !== "cancelled" && (b.payment_status || "paid") !== "pending").reduce((sum, b) => sum + (b.service?.price || 0), 0),
     today: bookings.filter((b) => b.createdAt && new Date(b.createdAt).toDateString() === new Date().toDateString()).length,
   };
 
@@ -252,6 +252,10 @@ export default function Admin({ initialBookings }) {
                     ["Service", selected.service?.name],
                     ["Duration", selected.service?.duration],
                     ["Price", selected.service?.price ? `$${selected.service.price}` : "Custom"],
+                    ["Payment", selected.payment_status === "paid" ? "Paid" : selected.payment_status === "pending" ? "Pending" : "–"],
+                    ...(selected.service?.apartment
+                      ? [["Apartment", `${selected.service.apartment.name} (${selected.service.apartment.location})`]]
+                      : []),
                     ["Date", formatDate(selected.date)],
                     ["Time", selected.time || "–"],
                     ["Booked On", formatDate(selected.createdAt)],
@@ -262,6 +266,31 @@ export default function Admin({ initialBookings }) {
                     </div>
                   ))}
                 </div>
+
+                {selected.customer?.brandName && (
+                  <div className="mb-6">
+                    <p className="text-xs font-semibold text-slate-850/50 uppercase tracking-wide mb-2">Brand Details</p>
+                    <div className="space-y-1.5 text-sm bg-cream-50 rounded-xl p-3">
+                      {[
+                        ["Brand", selected.customer.brandName],
+                        ["Industry", selected.customer.brandIndustry || "–"],
+                        ["Website", selected.customer.brandWebsite || "–"],
+                      ].map(([label, val]) => (
+                        <div key={label} className="flex justify-between gap-2">
+                          <span className="text-slate-850/50 shrink-0">{label}</span>
+                          <span className="font-medium text-slate-850 text-right truncate">{val}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {selected.customer?.brandGoals && (
+                  <div className="mb-6">
+                    <p className="text-xs font-semibold text-slate-850/50 uppercase tracking-wide mb-2">Brand Goals</p>
+                    <p className="text-sm text-slate-850/70 bg-cream-50 rounded-xl p-3 leading-relaxed">{selected.customer.brandGoals}</p>
+                  </div>
+                )}
 
                 {selected.customer?.details && (
                   <div className="mb-6">

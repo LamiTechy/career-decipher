@@ -56,11 +56,11 @@ export const mainServices = [
   {
     id: "brand-collaboration",
     name: "Brand Collaboration",
-    displayName: "Partnership With LuvMattaz Tv",
+    displayName: "Partnership With LuvMattaz TV",
     slug: "brand-collaboration",
     icon: "PenTool",
     price: 180,
-    currency: "CAD",
+    currency: "USD",
     duration: "120 mins",
     shortDesc: "Shape your story, partnerships, and creative presence so your brand feels authentic.",
     description: "Build a personal or business brand that stands out. We help you define your unique value, craft your story, and position yourself for meaningful collaborations.",
@@ -114,10 +114,10 @@ export const mainServices = [
     displayName: "Ask Hanot",
     slug: "general-consultation",
     icon: "Compass",
-    price: 120,
-    currency: "CAD",
+    price: 80,
+    currency: "USD",
     duration: "60 mins",
-    shortDesc: "Flexible strategy sessions for growth planning, project direction, and confidence building.",
+    shortDesc: "1-on-1 sessions designed around your specific lifestyle or personal needs.",
     description: "A flexible, personalized session tailored to your unique needs. Whether you need guidance on a specific challenge or broad strategic direction, we're here to help.",
     benefits: [
       "Flexible, personalized guidance",
@@ -129,7 +129,7 @@ export const mainServices = [
     ],
     includes: [
       "Custom consultation session",
-      "Problem-solving workshop",
+      "Problem-solving session",
       "Action plan development",
       "Resource recommendations",
       "2 weeks of email support"
@@ -170,7 +170,7 @@ export const mainServices = [
     slug: "shortlet",
     icon: "Home",
     price: 90,
-    currency: "CAD",
+    currency: "USD",
     duration: "Per night",
     shortDesc: "2-bedroom ensuite shortlet apartment in Abeokuta with premium amenities.",
     description:
@@ -271,7 +271,7 @@ export const mainServices = [
         location: "Abeokuta",
         bedrooms: 2,
         price: 90,
-        currency: "CAD",
+        currency: "USD",
         image: "🏡",
         description: "Comfortable 2-bedroom ensuite apartment with generator backup, borehole water, smart TV, and full kitchen."
       }

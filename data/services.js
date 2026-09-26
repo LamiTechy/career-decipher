@@ -100,7 +100,7 @@ export const services = [
     name: "Short-let Apartment",
     duration: "Per night",
     price: 90,
-    currency: "CAD",
+    currency: "USD",
     icon: "Home",
     shortDesc: "Book comfortable short-term apartments for your stay.",
     description:

@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Link from "next/link";
-import { Sparkles, Handshake, PenTool, Compass, Home as HomeIcon, ArrowRight } from "lucide-react";
+import { Handshake, PenTool, Compass, Home as HomeIcon, ArrowRight } from "lucide-react";
 import { mainServices } from "../data/mainServices";
 
 const offerings = mainServices.map((service) => ({
@@ -19,39 +19,6 @@ const offerings = mainServices.map((service) => ({
   slug: service.slug,
 }));
 
-const benefits = [
-  {
-    title: "Warm, human-first guidance",
-    description: "A calm, modern process with clear next steps and thoughtful follow-up support.",
-  },
-  {
-    title: "Actionable clarity",
-    description: "Walk away with practical recommendations you can use immediately in your career or brand work.",
-  },
-  {
-    title: "Tailored for your goals",
-    description: "Every session is built around your experience, audience, and the opportunities you want next.",
-  },
-];
-
-const testimonials = [
-  {
-    quote: "The brand session helped me stand out and land the right collaboration. The process felt calm, clear, and professional.",
-    name: "Olivia N.",
-    role: "Creative Director",
-  },
-  {
-    quote: "I finally understood how to tell my story in a way that felt true. The career advice was warm and direct - exactly what I needed.",
-    name: "Daniel A.",
-    role: "Consulting Professional",
-  },
-  {
-    quote: "I booked a strategy call and walked away with a complete plan. The follow-up support made a real difference.",
-    name: "Sade I.",
-    role: "Entrepreneur",
-  },
-];
-
 export default function Home() {
   return (
     <>
@@ -66,10 +33,6 @@ export default function Home() {
       <section className="min-h-screen bg-cream-50 pt-24">
         <div className="mx-auto flex max-w-6xl flex-col-reverse gap-12 px-6 lg:grid lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16">
           <div className="space-y-8">
-            <div className="inline-flex items-center gap-3 rounded-full bg-white/90 px-5 py-3 text-sm text-forest-700 shadow-sm border border-cream-200 max-lg:hidden">
-              <Sparkles className="w-4 h-4 text-gold-400" />
-              Welcome
-            </div>
             <div className="space-y-6">
               <h1 className="font-display text-5xl font-bold tracking-tight text-slate-900 sm:text-6xl">
                 Welcome! I'm so glad you're here.
@@ -90,19 +53,12 @@ export default function Home() {
           </div>
 
           <div className="flex items-center justify-center">
-            <div className="w-full max-w-sm aspect-[3/4] overflow-hidden rounded-[2rem] shadow-[0_30px_60px_rgba(62,44,14,0.08)]">
+            <div className="w-full max-w-sm aspect-[5/6] overflow-hidden rounded-[2rem] shadow-[0_30px_60px_rgba(62,44,14,0.08)]">
               <img
-                src="/WhatsApp_Image_2026-07-02_at_12.24.11_PM-removebg-preview.png"
+                src="/ceo.jpeg"
                 alt="Hanot Hub"
                 className="w-full h-full object-cover"
               />
-            </div>
-          </div>
-
-          <div className="flex justify-center lg:hidden">
-            <div className="inline-flex items-center gap-3 rounded-full bg-white/90 px-5 py-3 text-sm text-forest-700 shadow-sm border border-cream-200">
-              <Sparkles className="w-4 h-4 text-gold-400" />
-              Welcome
             </div>
           </div>
         </div>
@@ -111,7 +67,6 @@ export default function Home() {
       <section className="bg-white py-24">
         <div className="mx-auto max-w-6xl px-6 text-center">
           <p className="text-sm uppercase tracking-[0.3em] text-forest-500">What we do</p>
-          <h2 className="font-display text-4xl font-bold text-slate-900 mt-4">Career consultation, brand collaboration, and general support in one warm modern place.</h2>
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             {offerings.map((item) => (
               <Link
@@ -128,73 +83,6 @@ export default function Home() {
                   Learn more <ArrowRight className="w-4 h-4" />
                 </div>
               </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-cream-50 py-24">
-        <div className="mx-auto max-w-6xl px-6 grid gap-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-          <div className="space-y-8">
-            <p className="text-sm uppercase tracking-[0.3em] text-forest-500">Why this feels different</p>
-            <h2 className="font-display text-4xl font-bold text-slate-900">A modern, thoughtful process built for real results.</h2>
-            <p className="max-w-xl text-lg leading-relaxed text-slate-700">
-              We focus on strategy that feels friendly and professional, so every session helps you move forward with confidence and clarity.
-            </p>
-            <div className="grid gap-4">
-              {benefits.map((item) => (
-                <div key={item.title} className="rounded-3xl bg-white p-6 shadow-sm border border-cream-200">
-                  <h3 className="text-xl font-semibold text-slate-900 mb-2">{item.title}</h3>
-                  <p className="text-slate-700 leading-relaxed">{item.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-[2rem] border border-cream-200 bg-white p-10 shadow-[0_40px_80px_rgba(62,44,14,0.08)]">
-            <Link href="/services/brand-collaboration" className="block">
-              <div className="flex items-center justify-between gap-4 rounded-3xl bg-forest-500/10 p-6 cursor-pointer hover:bg-forest-500/20 transition">
-                <div>
-                  <p className="text-sm uppercase tracking-[0.3em] text-forest-700">Featured service</p>
-                  <p className="mt-2 text-2xl font-semibold text-slate-900">Brand & Career Launch</p>
-                </div>
-                <div className="rounded-3xl bg-forest-500 px-4 py-3 text-white text-sm font-semibold">Popular</div>
-              </div>
-            </Link>
-            <div className="mt-8 space-y-4">
-              <p className="text-slate-700 leading-relaxed">
-                Perfect for professionals who want career momentum plus a stronger personal brand and collaboration strategy.
-              </p>
-              <ul className="space-y-3 text-slate-700 leading-relaxed">
-                <li>- Define your next career or brand direction</li>
-                <li>- Shape collaboration opportunities that feel aligned</li>
-                <li>- Get a clear follow-up plan and confidence to move forward</li>
-              </ul>
-              <Link
-                href="/booking/brand-collaboration"
-                className="inline-flex items-center gap-2 mt-6 px-6 py-3 rounded-full bg-forest-500 text-white font-semibold hover:bg-forest-600 transition"
-              >
-                Book This Service
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-white py-24">
-        <div className="mx-auto max-w-6xl px-6 text-center">
-          <p className="text-sm uppercase tracking-[0.3em] text-forest-500">Client stories</p>
-          <h2 className="font-display text-4xl font-bold text-slate-900 mt-4">Feedback from people who took the next step.</h2>
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {testimonials.map((testimonial) => (
-              <div key={testimonial.name} className="rounded-[2rem] border border-cream-200 bg-cream-50 p-8 shadow-sm">
-                <p className="text-slate-700 leading-relaxed mb-6">"{testimonial.quote}"</p>
-                <div className="text-slate-900">
-                  <p className="font-semibold">{testimonial.name}</p>
-                  <p className="text-sm text-slate-600">{testimonial.role}</p>
-                </div>
-              </div>
             ))}
           </div>
         </div>

@@ -8,14 +8,14 @@ export default function Services() {
   return (
     <>
       <Head>
-        <title>Services & Pricing – Hanot Hub</title>
+        <title>Career Decipher Consult</title>
         <meta name="description" content="View all career consulting services and pricing. Resume review, interview prep, LinkedIn optimization, and more." />
       </Head>
 
       {/* Page header */}
       <section className="bg-cream-50 pt-32 pb-16 border-b border-cream-200">
         <div className="max-w-6xl mx-auto px-6 text-center">
-          <span className="text-forest-500 text-sm font-semibold uppercase tracking-widest">Services & Pricing</span>
+          <span className="text-forest-500 text-sm font-semibold uppercase tracking-widest">Career Decipher Consult</span>
           <h1 className="font-display text-5xl font-bold text-slate-850 mt-2 mb-4">
             Invest in your career future
           </h1>
@@ -29,7 +29,7 @@ export default function Services() {
       <section className="py-20 bg-cream-50">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-8">
-            {services.map((service) => (
+            {services.filter((service) => service.id !== "shortlet").map((service) => (
               <ServiceCard key={service.id} service={service} />
             ))}
           </div>
@@ -62,7 +62,6 @@ export default function Services() {
               { q: "How do sessions work?", a: "All sessions are conducted via video call (Zoom or Google Meet). You'll receive a calendar invite with the link after booking." },
               { q: "What happens after I book?", a: "You'll receive a confirmation email with your session details. For resume/cover letter reviews, we'll ask you to send your documents 24 hours in advance." },
               { q: "Can I reschedule my session?", a: "Yes! You can reschedule up to 24 hours before your session at no charge. Reach out to hello@careerdecipher.com to reschedule." },
-              { q: "Is there a satisfaction guarantee?", a: "Absolutely. If you're not satisfied with your session, we'll offer a free follow-up session or a full refund — no questions asked." },
               { q: "What if I need ongoing support?", a: "Consider the Bundle Package for 5 hours of dedicated support, or reach out about our monthly mentorship plans." },
             ].map((faq) => (
               <div key={faq.q} className="bg-white rounded-xl p-6 border border-cream-200">

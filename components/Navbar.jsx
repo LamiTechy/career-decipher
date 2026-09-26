@@ -41,7 +41,7 @@ export default function Navbar() {
         <Link href="/" className="flex items-center gap-3 group">
           <div className="w-10 h-10 overflow-hidden rounded-lg transition-transform group-hover:scale-105">
             <img
-              src="/hanot-hub-logo.svg"
+              src="/logo.png"
               alt="Hanot Hub logo"
               className="w-full h-full object-cover"
             />

@@ -19,12 +19,14 @@ const WEEKEND_SLOTS = [
   "5:00 PM", "5:30 PM",
 ];
 
-const getSteps = (isShortlet) => {
-  const baseSteps = ["Service", "Date & Time", "Your Info", "Payment", "Confirm"];
+const getSteps = (isShortlet, isConnect) => {
+  if (isConnect) {
+    return ["Service", "Date & Time", "Your Info", "Confirm"];
+  }
   if (isShortlet) {
     return ["Service", "Select Apartment", "Check-in Date", "Your Info", "Payment", "Confirm"];
   }
-  return baseSteps;
+  return ["Service", "Date & Time", "Your Info", "Payment", "Confirm"];
 };
 
 export default function ServiceBooking() {
@@ -39,7 +41,7 @@ export default function ServiceBooking() {
     displayName: mainService?.displayName || detailedService?.name || mainService?.name,
     description: detailedService?.description || mainService?.description,
     shortDesc: detailedService?.shortDesc || mainService?.shortDesc,
-    price: detailedService?.price ?? mainService?.price,    currency: detailedService?.currency || mainService?.currency || "CAD",    duration: detailedService?.duration || mainService?.duration,
+    price: detailedService?.price ?? mainService?.price,    currency: detailedService?.currency || mainService?.currency || "USD",    duration: detailedService?.duration || mainService?.duration,
     highlights: detailedService?.highlights || mainService?.highlights || [],
     includes: mainService?.includes || detailedService?.highlights || [],
     benefits: mainService?.benefits || [],
@@ -48,13 +50,17 @@ export default function ServiceBooking() {
     slug: mainService?.slug || detailedService?.id,
   };
 
+  const isConnect = service === "brand-collaboration";
+  const isShortletService = service === "shortlet";
+  const totalSteps = isConnect ? 4 : isShortletService ? 6 : 5;
+
   const [step, setStep] = useState(1);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [selectedApartment, setSelectedApartment] = useState(null);
   const [apartments, setApartments] = useState([]);
   const [apartmentAvailability, setApartmentAvailability] = useState({});
-  const [form, setForm] = useState({ name: "", email: "", phone: "", details: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", details: "", brandName: "", brandWebsite: "", brandIndustry: "", brandGoals: "" });
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [paymentError, setPaymentError] = useState(null);
   const [booking, setBooking] = useState(null);
@@ -115,7 +121,10 @@ export default function ServiceBooking() {
 
   const canProceed = () => {
     const isShortlet = service === "shortlet";
-    if (isShortlet) {
+    if (isConnect) {
+      if (step === 2) return !!selectedDate && !!selectedTime;
+      if (step === 3) return form.name.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email) && form.brandName.trim();
+    } else if (isShortlet) {
       if (step === 2) return !!selectedApartment;
       if (step === 3) return !!selectedDate;
       if (step === 4) return form.name.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
@@ -182,19 +191,18 @@ export default function ServiceBooking() {
 
     try {
       const price = service === "shortlet" && selectedApartment ? selectedApartment.price : serviceData.price;
-      const amount = Math.round(price * 100);
-      const successUrl = `${origin}/booking/${service}?sessionId={CHECKOUT_SESSION_ID}`;
+      const successUrl = `${origin}/booking/${service}`;
       const cancelUrl = `${origin}/booking/${service}`;
 
-      const res = await fetch("/api/stripe", {
+      const res = await fetch("/api/paystack", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: form.email,
           name: serviceData.name,
           phone: form.phone,
-          amount,
-          currency: (serviceData.currency || "CAD").toLowerCase(),
+          amount: price,
+          currency: (serviceData.currency || "USD").toLowerCase(),
           successUrl,
           cancelUrl,
         }),
@@ -214,16 +222,16 @@ export default function ServiceBooking() {
     }
   };
 
-  const verifyPayment = async (sessionId) => {
-    if (!sessionId) return;
+  const verifyPayment = async (reference) => {
+    if (!reference) return;
     setLoading(true);
     setPaymentError(null);
 
     try {
-      const res = await fetch("/api/stripe", {
+      const res = await fetch("/api/paystack", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ verify: true, sessionId }),
+        body: JSON.stringify({ verify: true, reference }),
       });
       const data = await res.json();
 
@@ -254,7 +262,7 @@ export default function ServiceBooking() {
         date: selectedDate?.toISOString(),
         time: selectedTime || "N/A",
         customer: form,
-        paymentStatus: "paid",
+        paymentStatus: isConnect ? "pending" : "paid",
       };
 
       const res = await fetch("/api/bookings", {
@@ -265,9 +273,8 @@ export default function ServiceBooking() {
       const data = await res.json();
       if (data.success) {
         setBooking(data.booking);
-        const finalStep = isShortlet ? 6 : 5;
-        setStep(finalStep);
-        toast.success("Booking confirmed! Check your email.");
+        setStep(totalSteps);
+        toast.success(isConnect ? "Request received! Check your email." : "Booking confirmed! Check your email.");
       } else {
         throw new Error(data.error || "Something went wrong. Please try again.");
       }
@@ -280,17 +287,17 @@ export default function ServiceBooking() {
 
   useEffect(() => {
     if (!router.isReady) return;
-    const { sessionId } = router.query;
+    const { reference } = router.query;
 
-    if (sessionId && !hasVerifiedSession.current) {
+    if (reference && !hasVerifiedSession.current) {
       const savedState = loadBookingState();
       if (savedState) {
         setSelectedDate(savedState.selectedDate ? new Date(savedState.selectedDate) : null);
         setSelectedTime(savedState.selectedTime || null);
-        setForm(savedState.customer || { name: "", email: "", phone: "", details: "" });
+        setForm(savedState.customer || { name: "", email: "", phone: "", details: "", brandName: "", brandWebsite: "", brandIndustry: "", brandGoals: "" });
       }
       setStep(4);
-      verifyPayment(sessionId);
+      verifyPayment(reference);
       hasVerifiedSession.current = true;
     }
   }, [router.isReady, router.query]);
@@ -318,7 +325,7 @@ export default function ServiceBooking() {
 
   const handleConfirm = async () => {
     const paymentStep = service === "shortlet" ? 5 : 4;
-    if (step === paymentStep && paymentStatus !== "paid") {
+    if (!isConnect && step === paymentStep && paymentStatus !== "paid") {
       toast.error("Please complete payment before confirming your booking.");
       return;
     }
@@ -331,7 +338,7 @@ export default function ServiceBooking() {
   return (
     <>
       <Head>
-        <title>Book {serviceData.displayName} - Hanot Hub</title>
+        <title>{isConnect ? `Connect - ${serviceData.displayName}` : `Book ${serviceData.displayName} - Hanot Hub`}</title>
         <meta name="description" content={`Book your ${serviceData.displayName} session with Hanot Hub`} />
       </Head>
 
@@ -343,14 +350,20 @@ export default function ServiceBooking() {
           </Link>
 
           <div className="text-center mb-10">
-            <h1 className="font-display text-4xl font-bold text-slate-850 mb-2">Book Your Session</h1>
-            <p className="text-slate-850/60">Complete the steps below to confirm your booking</p>
+            <h1 className="font-display text-4xl font-bold text-slate-850 mb-2">
+              {isConnect ? "Connect With Us" : "Book Your Session"}
+            </h1>
+            <p className="text-slate-850/60">
+              {isConnect
+                ? "Tell us about your brand and we'll get back to you — no payment required"
+                : "Complete the steps below to confirm your booking"}
+            </p>
           </div>
 
           {/* Step indicator */}
-          {step < (service === "shortlet" ? 6 : 5) && (
+          {step < totalSteps && (
             <div className="flex items-center justify-center gap-2 mb-10 flex-wrap">
-              {getSteps(service === "shortlet").map((s, i) => {
+              {getSteps(isShortletService, isConnect).map((s, i) => {
                 const num = i + 1;
                 const isActive = num === step;
                 const isDone = num < step;
@@ -370,7 +383,7 @@ export default function ServiceBooking() {
                       </span>
                       {s}
                     </div>
-                    {i < getSteps(service === "shortlet").length - 2 && <span className="text-cream-200 text-lg">→</span>}
+                    {i < getSteps(isShortletService, isConnect).length - 2 && <span className="text-cream-200 text-lg">→</span>}
                   </div>
                 );
               })}
@@ -408,8 +421,12 @@ export default function ServiceBooking() {
               )}
 
               <div className="rounded-2xl bg-cream-50 p-6 border border-cream-200">
-                <p className="font-semibold text-slate-850 mb-2">Ready to book?</p>
-                <p className="text-slate-700 text-sm">Continue to appointment selection and fill your details on the next screen.</p>
+                <p className="font-semibold text-slate-850 mb-2">{isConnect ? "Ready to connect?" : "Ready to book?"}</p>
+                <p className="text-slate-700 text-sm">
+                  {isConnect
+                    ? "Continue to pick a time and tell us about your brand on the next screen."
+                    : "Continue to appointment selection and fill your details on the next screen."}
+                </p>
               </div>
             </div>
           )}
@@ -503,7 +520,9 @@ export default function ServiceBooking() {
           {/* STEP 3/4: Contact Info */}
           {step === (service === "shortlet" ? 4 : 3) && (
             <div className="bg-white rounded-2xl border border-cream-200 p-8">
-              <h2 className="font-display text-2xl font-bold text-slate-850 mb-6">Your Information</h2>
+              <h2 className="font-display text-2xl font-bold text-slate-850 mb-6">
+                {isConnect ? "Tell Us About Your Brand" : "Your Information"}
+              </h2>
               <div className="space-y-5">
                 <div className="grid sm:grid-cols-2 gap-5">
                   <div>
@@ -537,15 +556,55 @@ export default function ServiceBooking() {
                     className="w-full px-4 py-3 rounded-xl border border-cream-200 focus:border-forest-400 focus:ring-2 focus:ring-forest-500/20 outline-none text-sm transition-all bg-cream-50"
                   />
                 </div>
+                {isConnect && (
+                  <>
+                    <div className="grid sm:grid-cols-2 gap-5">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-850 mb-2">Brand / Business Name *</label>
+                        <input
+                          type="text"
+                          placeholder="Your brand name"
+                          value={form.brandName}
+                          onChange={(e) => setForm({ ...form, brandName: e.target.value })}
+                          className="w-full px-4 py-3 rounded-xl border border-cream-200 focus:border-forest-400 focus:ring-2 focus:ring-forest-500/20 outline-none text-sm transition-all bg-cream-50"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-850 mb-2">Industry / Niche</label>
+                        <input
+                          type="text"
+                          placeholder="Fashion, tech, food..."
+                          value={form.brandIndustry}
+                          onChange={(e) => setForm({ ...form, brandIndustry: e.target.value })}
+                          className="w-full px-4 py-3 rounded-xl border border-cream-200 focus:border-forest-400 focus:ring-2 focus:ring-forest-500/20 outline-none text-sm transition-all bg-cream-50"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-850 mb-2">Website / Social Link (Optional)</label>
+                      <input
+                        type="text"
+                        placeholder="https://yourbrand.com or @yourbrand"
+                        value={form.brandWebsite}
+                        onChange={(e) => setForm({ ...form, brandWebsite: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl border border-cream-200 focus:border-forest-400 focus:ring-2 focus:ring-forest-500/20 outline-none text-sm transition-all bg-cream-50"
+                      />
+                    </div>
+                  </>
+                )}
                 <div>
                   <label className="block text-sm font-semibold text-slate-850 mb-2">
-                    Tell us about your situation / goals
+                    {isConnect ? "Tell us about your brand and what you're looking for" : "Tell us about your situation / goals"}
                   </label>
                   <textarea
                     rows={4}
-                    placeholder="I'm looking to transition from marketing to product management. I have 4 years of experience and..."
-                    value={form.details}
-                    onChange={(e) => setForm({ ...form, details: e.target.value })}
+                    placeholder={
+                      isConnect
+                        ? "What does your brand do, who is your audience, and what kind of collaboration are you hoping for?"
+                        : "I'm looking to transition from marketing to product management. I have 4 years of experience and..."
+                    }
+                    value={isConnect ? form.brandGoals : form.details}
+                    onChange={(e) => setForm({ ...form, [isConnect ? "brandGoals" : "details"]: e.target.value })}
                     className="w-full px-4 py-3 rounded-xl border border-cream-200 focus:border-forest-400 focus:ring-2 focus:ring-forest-500/20 outline-none text-sm transition-all bg-cream-50 resize-none"
                   />
                 </div>
@@ -554,7 +613,7 @@ export default function ServiceBooking() {
           )}
 
           {/* STEP 4/5: Payment */}
-          {step === (service === "shortlet" ? 5 : 4) && (
+          {!isConnect && step === (service === "shortlet" ? 5 : 4) && (
             <div className="bg-white rounded-2xl border border-cream-200 p-8">
               <h2 className="font-display text-2xl font-bold text-slate-850 mb-2">Payment</h2>
               <div className="flex items-center gap-2 text-xs text-slate-850/50 mb-6">
@@ -598,18 +657,18 @@ export default function ServiceBooking() {
                   <div className="rounded-2xl border border-cream-200 bg-cream-50 p-5">
                     <p className="font-semibold text-slate-850 mb-2">Payment method</p>
                     <p className="text-sm text-slate-850/70">
-                      Choose Stripe to complete your payment using a secure checkout.
+                      Choose Paystack to complete your payment using a secure checkout.
                     </p>
                     {paymentError && (
                       <p className="mt-3 text-sm text-red-600">{paymentError}</p>
                     )}
                   </div>
                   <button
-                    onClick={() => handlePayment("stripe")}
+                    onClick={() => handlePayment()}
                     disabled={loading}
                     className="w-full py-4 bg-forest-500 hover:bg-forest-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-all"
                   >
-                    {loading ? "Redirecting to payment…" : "Pay with Stripe"}
+                    {loading ? "Redirecting to payment…" : "Pay with Paystack"}
                   </button>
                 </div>
               )}
@@ -617,18 +676,38 @@ export default function ServiceBooking() {
           )}
 
           {/* STEP 5/6: Confirmation */}
-          {step === (service === "shortlet" ? 6 : 5) && (
+          {step === totalSteps && (
             <div className="bg-white rounded-2xl border border-cream-200 p-10 text-center">
               <div className="w-20 h-20 bg-forest-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-forest-700">
                 <CheckCircle2 className="w-10 h-10" />
               </div>
-              <h2 className="font-display text-3xl font-bold text-slate-850 mb-2">You're all booked!</h2>
-              <p className="text-slate-850/60 mb-8">A confirmation has been sent to <strong>{form.email}</strong></p>
+              <h2 className="font-display text-3xl font-bold text-slate-850 mb-2">
+                {isConnect ? "Request received!" : "You're all booked!"}
+              </h2>
+              <p className="text-slate-850/60 mb-8">
+                {isConnect ? "Thanks — we've sent your details to" : "A confirmation has been sent to"}{" "}
+                <strong>{form.email}</strong>
+              </p>
 
               <div className="bg-cream-50 rounded-2xl p-6 text-left border border-cream-200 mb-8">
-                <h3 className="font-semibold text-slate-850 mb-4 text-sm uppercase tracking-wide">Booking Details</h3>
+                <h3 className="font-semibold text-slate-850 mb-4 text-sm uppercase tracking-wide">
+                  {isConnect ? "Request Details" : "Booking Details"}
+                </h3>
                 <div className="space-y-3">
-                  {service === "shortlet" && selectedApartment ? (
+                  {isConnect ? (
+                    [
+                      ["Service", serviceData.displayName],
+                      ["Brand", form.brandName],
+                      ["Date", formatDate(selectedDate)],
+                      ["Time", selectedTime],
+                      ["Status", "Received"],
+                    ].map(([label, value]) => (
+                      <div key={label} className="flex justify-between text-sm">
+                        <span className="text-slate-850/50">{label}</span>
+                        <span className="font-medium text-slate-850">{value}</span>
+                      </div>
+                    ))
+                  ) : service === "shortlet" && selectedApartment ? (
                     [
                       ["Service", serviceData.displayName],
                       ["Apartment", selectedApartment.name],
@@ -667,7 +746,7 @@ export default function ServiceBooking() {
           )}
 
           {/* Navigation */}
-          {step < (service === "shortlet" ? 6 : 5) && (
+          {step < totalSteps && (
             <div className="flex justify-between mt-6">
               <button
                 onClick={() => setStep(step - 1)}
@@ -676,7 +755,7 @@ export default function ServiceBooking() {
               >
                 ← Back
               </button>
-              {step < (service === "shortlet" ? 5 : 4) ? (
+              {step < totalSteps - 1 ? (
                 <button
                   onClick={() => setStep(step + 1)}
                   disabled={!canProceed()}
@@ -701,7 +780,7 @@ export default function ServiceBooking() {
                   ) : (
                     <span className="inline-flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4" />
-                      Confirm Booking
+                      {isConnect ? "Send Request" : "Confirm Booking"}
                     </span>
                   )}
                 </button>
