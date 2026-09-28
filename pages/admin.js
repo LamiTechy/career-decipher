@@ -2,6 +2,7 @@ import Head from "next/head";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { Lock, CalendarDays, CheckCircle2, DollarSign, Clock, Inbox, X, Send } from "lucide-react";
+import { formatMoney } from "../lib/currency";
 
 export async function getServerSideProps() {
   try {
@@ -99,10 +100,20 @@ export default function Admin({ initialBookings }) {
     return matchFilter && matchSearch;
   });
 
+  const paidBookings = bookings.filter(
+    (b) => b.status !== "cancelled" && (b.payment_status || "paid") !== "pending"
+  );
+  const isNgn = (b) => b.service?.payment?.currency === "NGN";
+
   const stats = {
     total: bookings.length,
     confirmed: bookings.filter((b) => b.status === "confirmed").length,
-    revenue: bookings.filter((b) => b.status !== "cancelled" && (b.payment_status || "paid") !== "pending").reduce((sum, b) => sum + (b.service?.price || 0), 0),
+    revenueUsd: paidBookings
+      .filter((b) => !isNgn(b))
+      .reduce((sum, b) => sum + (b.service?.payment?.amount ?? b.service?.price ?? 0), 0),
+    revenueNgn: paidBookings
+      .filter(isNgn)
+      .reduce((sum, b) => sum + (b.service?.payment?.amount || 0), 0),
     today: bookings.filter((b) => b.createdAt && new Date(b.createdAt).toDateString() === new Date().toDateString()).length,
   };
 
@@ -155,7 +166,13 @@ export default function Admin({ initialBookings }) {
             {[
               { label: "Total Bookings", value: stats.total, icon: <CalendarDays className="w-6 h-6" /> },
               { label: "Confirmed", value: stats.confirmed, icon: <CheckCircle2 className="w-6 h-6" /> },
-              { label: "Total Revenue", value: `$${stats.revenue}`, icon: <DollarSign className="w-6 h-6" /> },
+              {
+                label: "Total Revenue",
+                value: stats.revenueNgn > 0
+                  ? `${formatMoney(stats.revenueUsd, "USD")} · ${formatMoney(stats.revenueNgn, "NGN")}`
+                  : formatMoney(stats.revenueUsd, "USD"),
+                icon: <DollarSign className="w-6 h-6" />,
+              },
               { label: "Today", value: stats.today, icon: <Clock className="w-6 h-6" /> },
             ].map((s) => (
               <div key={s.label} className="bg-white rounded-xl border border-cream-200 p-5">
@@ -251,7 +268,11 @@ export default function Admin({ initialBookings }) {
                     ["Phone", selected.customer?.phone || "–"],
                     ["Service", selected.service?.name],
                     ["Duration", selected.service?.duration],
-                    ["Price", selected.service?.price ? `$${selected.service.price}` : "Custom"],
+                    ["Price", selected.service?.payment
+                      ? formatMoney(selected.service.payment.amount, selected.service.payment.currency)
+                      : selected.service?.price
+                        ? `${formatMoney(selected.service.price, "USD")}`
+                        : "Custom"],
                     ["Payment", selected.payment_status === "paid" ? "Paid" : selected.payment_status === "pending" ? "Pending" : "–"],
                     ...(selected.service?.apartment
                       ? [["Apartment", `${selected.service.apartment.name} (${selected.service.apartment.location})`]]

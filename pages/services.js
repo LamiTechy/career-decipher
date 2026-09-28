@@ -3,8 +3,14 @@ import Link from "next/link";
 import { Rocket } from "lucide-react";
 import { services } from "../data/services";
 import ServiceCard from "../components/ServiceCard";
+import { useCurrency } from "../components/CurrencyContext";
+import { toNgn, formatMoney, gatewayCurrency } from "../lib/currency";
 
 export default function Services() {
+  const { gateway } = useCurrency();
+  const currency = gatewayCurrency(gateway);
+  const bundlePrice = formatMoney(currency === "NGN" ? toNgn(250) : 250, currency);
+  const bundleSaving = formatMoney(currency === "NGN" ? toNgn(100) : 100, currency);
   return (
     <>
       <Head>
@@ -42,10 +48,10 @@ export default function Services() {
           <span className="text-gold-300 text-sm font-semibold uppercase tracking-widest">Best Value</span>
           <h2 className="font-display text-4xl font-bold text-white mt-2 mb-4 inline-flex items-center justify-center gap-3">
             <Rocket className="w-6 h-6" />
-            The Bundle Package — 5 Hours for $250
+            The Bundle Package — 5 Hours for {bundlePrice}
           </h2>
           <p className="text-white/70 text-lg mb-8 max-w-2xl mx-auto">
-            Get everything: resume, cover letter, LinkedIn, career strategy, interview prep, and 30-day follow-up email support. Save $100+ compared to individual sessions.
+            Get everything: resume, cover letter, LinkedIn, career strategy, interview prep, and 30-day follow-up email support. Save {bundleSaving}+ compared to individual sessions.
           </p>
           <Link href="/booking/bundle-package" className="inline-flex items-center gap-2 px-10 py-4 bg-gold-400 hover:bg-gold-500 text-white rounded-xl font-bold text-lg transition-all duration-200 hover:shadow-xl hover:-translate-y-1">
             Get the Bundle →

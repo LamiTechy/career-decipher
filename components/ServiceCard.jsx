@@ -12,6 +12,8 @@ import {
   Circle,
   Check,
 } from "lucide-react";
+import { useCurrency } from "./CurrencyContext";
+import { toNgn, formatMoney, gatewayCurrency } from "../lib/currency";
 
 const ICON_MAP = {
   Compass,
@@ -27,6 +29,8 @@ const ICON_MAP = {
 
 export default function ServiceCard({ service, compact = false }) {
   const Icon = ICON_MAP[service.icon] || Circle;
+  const { gateway } = useCurrency();
+  const localCurrency = service.currency === "CAD" ? "CAD" : gatewayCurrency(gateway);
 
   return (
     <div
@@ -76,7 +80,7 @@ export default function ServiceCard({ service, compact = false }) {
           {service.price ? (
             <div>
               <span className="text-2xl font-display font-bold text-forest-600">
-                {service.currency === "CAD" ? `CAD ${service.price}` : `$${service.price}`}
+                {formatMoney(localCurrency === "NGN" ? toNgn(service.price) : service.price, localCurrency)}
               </span>
               <span className="text-slate-850/50 text-xs ml-1">/ {service.duration?.toLowerCase().includes("per night") ? "night" : "session"}</span>
             </div>

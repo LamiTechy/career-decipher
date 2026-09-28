@@ -7,6 +7,8 @@ import dynamic from "next/dynamic";
 import { ArrowLeft, CheckCircle2, ShieldCheck, Check } from "lucide-react";
 import { mainServices } from "../../data/mainServices";
 import { services as detailedServices } from "../../data/services";
+import { useCurrency } from "../../components/CurrencyContext";
+import { toNgn, formatMoney, gatewayCurrency } from "../../lib/currency";
 
 const Calendar = dynamic(() => import("react-calendar"), { ssr: false });
 
@@ -18,6 +20,9 @@ const WEEKEND_SLOTS = [
   "3:00 PM", "3:30 PM", "4:00 PM", "4:30 PM",
   "5:00 PM", "5:30 PM",
 ];
+
+// Location picks the gateway: Nigeria → Paystack (charged in ₦),
+// everywhere else → Stripe (charged in USD). See lib/currency.js.
 
 const getSteps = (isShortlet, isConnect) => {
   if (isConnect) {
@@ -32,6 +37,7 @@ const getSteps = (isShortlet, isConnect) => {
 export default function ServiceBooking() {
   const router = useRouter();
   const { service } = router.query;
+  const { gateway: detectedGateway } = useCurrency();
 
   const mainService = mainServices.find((s) => s.slug === service);
   const detailedService = detailedServices.find((s) => s.id === service);
@@ -63,9 +69,17 @@ export default function ServiceBooking() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", details: "", brandName: "", brandWebsite: "", brandIndustry: "", brandGoals: "" });
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [paymentError, setPaymentError] = useState(null);
+  const [gatewayOverride, setGatewayOverride] = useState(null);
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(false);
   const hasVerifiedSession = useRef(false);
+  const paymentRef = useRef(null);
+
+  // Nigeria → Paystack (₦), everyone else → Stripe ($). The override keeps the
+  // currency stable when the buyer returns from the gateway redirect.
+  const gateway = gatewayOverride || detectedGateway;
+  const payCurrency = gatewayCurrency(gateway);
+  const displayPrice = (usd) => formatMoney(payCurrency === "NGN" ? toNgn(usd) : usd, payCurrency);
 
   const BOOKING_STATE_KEY = "career_decipher_booking_state";
 
@@ -97,14 +111,6 @@ export default function ServiceBooking() {
       console.warn("Unable to clear booking state", error);
     }
   };
-
-  if (!router.isReady || !serviceData.name) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-slate-700">Loading...</p>
-      </div>
-    );
-  }
 
   const isWeekend = (date) => [0, 6].includes(date.getDay());
   const getAvailableTimeSlots = (date) => {
@@ -178,37 +184,63 @@ export default function ServiceBooking() {
       return;
     }
 
+    const basePrice = service === "shortlet" && selectedApartment ? selectedApartment.price : serviceData.price;
+    const chargeAmount = payCurrency === "NGN" ? toNgn(basePrice) : basePrice;
+    const payment = { amount: chargeAmount, currency: payCurrency };
+    paymentRef.current = payment;
+
     saveBookingState({
       service: serviceData,
       selectedDate: selectedDate?.toISOString(),
       selectedTime,
       customer: form,
       selectedApartment,
+      gateway,
+      payment,
     });
 
     setLoading(true);
     setPaymentError(null);
 
     try {
-      const price = service === "shortlet" && selectedApartment ? selectedApartment.price : serviceData.price;
       const successUrl = `${origin}/booking/${service}`;
       const cancelUrl = `${origin}/booking/${service}`;
 
-      const res = await fetch("/api/paystack", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: form.email,
-          name: serviceData.name,
-          phone: form.phone,
-          amount: price,
-          currency: (serviceData.currency || "USD").toLowerCase(),
-          successUrl,
-          cancelUrl,
-        }),
-      });
+      let data;
+      if (gateway === "paystack") {
+        // Nigerian buyers → Paystack, charged in Naira at the fixed NGN price.
+        const res = await fetch("/api/paystack", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: form.email,
+            name: serviceData.displayName || serviceData.name,
+            phone: form.phone,
+            amount: chargeAmount,
+            currency: "NGN",
+            successUrl,
+            cancelUrl,
+          }),
+        });
+        data = await res.json();
+      } else {
+        // Everyone else → Stripe, charged in USD; Stripe shows local currency at checkout.
+        const res = await fetch("/api/stripe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: form.email,
+            name: serviceData.displayName,
+            phone: form.phone,
+            amount: Math.round(chargeAmount * 100),
+            currency: "USD",
+            successUrl: `${successUrl}?sessionId={CHECKOUT_SESSION_ID}`,
+            cancelUrl,
+          }),
+        });
+        data = await res.json();
+      }
 
-      const data = await res.json();
       if (!data.status) {
         throw new Error(data.message || "Unable to initialize payment.");
       }
@@ -249,15 +281,49 @@ export default function ServiceBooking() {
     }
   };
 
+  const verifyStripe = async (sessionId) => {
+    if (!sessionId) return;
+    setLoading(true);
+    setPaymentError(null);
+
+    try {
+      const res = await fetch("/api/stripe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ verify: true, sessionId }),
+      });
+      const data = await res.json();
+
+      if (!data.status) {
+        throw new Error(data.message || "Payment verification failed.");
+      }
+
+      setPaymentStatus("paid");
+      await completeBooking();
+    } catch (err) {
+      setPaymentError(err.message || "Unable to verify payment.");
+      toast.error(err.message || "Unable to verify payment.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const completeBooking = async () => {
     setLoading(true);
     const isShortlet = service === "shortlet";
-    
+
+    const basePrice = isShortlet && selectedApartment ? selectedApartment.price : serviceData.price;
+    const payment = paymentRef.current || {
+      amount: payCurrency === "NGN" ? toNgn(basePrice) : basePrice,
+      currency: payCurrency,
+    };
+
     try {
       const bookingData = {
         service: {
           ...serviceData,
           ...(isShortlet && selectedApartment && { apartment: selectedApartment }),
+          ...(isConnect ? {} : { payment }),
         },
         date: selectedDate?.toISOString(),
         time: selectedTime || "N/A",
@@ -287,17 +353,24 @@ export default function ServiceBooking() {
 
   useEffect(() => {
     if (!router.isReady) return;
-    const { reference } = router.query;
+    const { reference, sessionId } = router.query;
 
-    if (reference && !hasVerifiedSession.current) {
+    if ((reference || sessionId) && !hasVerifiedSession.current) {
       const savedState = loadBookingState();
       if (savedState) {
         setSelectedDate(savedState.selectedDate ? new Date(savedState.selectedDate) : null);
         setSelectedTime(savedState.selectedTime || null);
         setForm(savedState.customer || { name: "", email: "", phone: "", details: "", brandName: "", brandWebsite: "", brandIndustry: "", brandGoals: "" });
+        if (savedState.gateway) setGatewayOverride(savedState.gateway);
+        if (savedState.payment) paymentRef.current = savedState.payment;
+        if (savedState.selectedApartment) setSelectedApartment(savedState.selectedApartment);
       }
-      setStep(4);
-      verifyPayment(reference);
+      setStep(service === "shortlet" ? 5 : 4);
+      if (reference) {
+        verifyPayment(reference);
+      } else {
+        verifyStripe(sessionId);
+      }
       hasVerifiedSession.current = true;
     }
   }, [router.isReady, router.query]);
@@ -316,6 +389,14 @@ export default function ServiceBooking() {
         .catch((err) => console.error("Failed to load apartments:", err));
     }
   }, [service]);
+
+  if (!router.isReady || !serviceData.name) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-slate-700">Loading...</p>
+      </div>
+    );
+  }
 
   const availabilityLabel = selectedDate
     ? isWeekend(selectedDate)
@@ -452,7 +533,7 @@ export default function ServiceBooking() {
                     <p className="text-sm text-slate-700 mb-3">{apartment.description}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-slate-600">{apartment.bedrooms}BR • {apartment.location}</span>
-                      <span className="font-bold text-forest-600">${apartment.price}/night</span>
+                      <span className="font-bold text-forest-600">{displayPrice(apartment.price)}/night</span>
                     </div>
                   </div>
                 ))}
@@ -638,7 +719,10 @@ export default function ServiceBooking() {
                   </div>
                   <div className="text-right">
                     <p className="font-bold text-forest-600 text-lg">
-                      ${selectedApartment?.price || serviceData.price}
+                      {displayPrice(selectedApartment?.price || serviceData.price)}
+                    </p>
+                    <p className="text-xs text-slate-850/50 mt-0.5">
+                      {payCurrency} · {gateway === "paystack" ? "Paystack" : "Stripe"}
                     </p>
                   </div>
                 </div>
@@ -657,7 +741,9 @@ export default function ServiceBooking() {
                   <div className="rounded-2xl border border-cream-200 bg-cream-50 p-5">
                     <p className="font-semibold text-slate-850 mb-2">Payment method</p>
                     <p className="text-sm text-slate-850/70">
-                      Choose Paystack to complete your payment using a secure checkout.
+                      {gateway === "paystack"
+                        ? "Pay in Naira with Paystack — card, bank transfer, and USSD accepted."
+                        : "Pay in USD with Stripe — Stripe shows your local currency at checkout."}
                     </p>
                     {paymentError && (
                       <p className="mt-3 text-sm text-red-600">{paymentError}</p>
@@ -668,7 +754,9 @@ export default function ServiceBooking() {
                     disabled={loading}
                     className="w-full py-4 bg-forest-500 hover:bg-forest-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-all"
                   >
-                    {loading ? "Redirecting to payment…" : "Pay with Paystack"}
+                    {loading
+                      ? "Redirecting to payment…"
+                      : `Pay ${displayPrice(selectedApartment?.price || serviceData.price)} with ${gateway === "paystack" ? "Paystack" : "Stripe"}`}
                   </button>
                 </div>
               )}
@@ -713,7 +801,7 @@ export default function ServiceBooking() {
                       ["Apartment", selectedApartment.name],
                       ["Location", selectedApartment.location],
                       ["Check-in Date", formatDate(selectedDate)],
-                      ["Price per Night", `$${selectedApartment.price}`],
+                      ["Price per Night", `${displayPrice(selectedApartment.price)}/night`],
                       ["Status", "Confirmed"],
                     ].map(([label, value]) => (
                       <div key={label} className="flex justify-between text-sm">
@@ -727,7 +815,7 @@ export default function ServiceBooking() {
                       ["Date", formatDate(selectedDate)],
                       ["Time", selectedTime],
                       ["Duration", serviceData.duration],
-                      ["Amount Paid", `$${serviceData.price}`],
+                      ["Amount Paid", displayPrice(serviceData.price)],
                       ["Status", "Confirmed"],
                     ].map(([label, value]) => (
                       <div key={label} className="flex justify-between text-sm">

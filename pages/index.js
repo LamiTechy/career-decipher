@@ -41,23 +41,14 @@ export default function Home() {
                 Whether you are looking to decode your next major career move, collaborate on an impactful brand campaign, book a memorable stay, or simply connect one-on-one—you've landed in the right place.
               </p>
             </div>
-
-            <div className="flex flex-wrap gap-4">
-              <Link
-                href="/services"
-                className="inline-flex items-center gap-2 rounded-full bg-forest-500 px-8 py-4 text-white text-base font-semibold shadow-lg shadow-forest-500/10 transition hover:bg-forest-600"
-              >
-                Explore Services <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
           </div>
 
           <div className="flex items-center justify-center">
-            <div className="w-full max-w-sm aspect-[5/6] overflow-hidden rounded-[2rem] shadow-[0_30px_60px_rgba(62,44,14,0.08)]">
+            <div className="w-full max-w-sm overflow-hidden rounded-[2rem] shadow-[0_30px_60px_rgba(62,44,14,0.08)]">
               <img
                 src="/ceo.jpeg"
                 alt="Hanot Hub"
-                className="w-full h-full object-cover"
+                className="w-full h-auto"
               />
             </div>
           </div>
@@ -102,12 +93,6 @@ export default function Home() {
             >
               Book a Service
               <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link
-              href="/services"
-              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-8 py-4 text-white font-semibold transition hover:bg-white/20"
-            >
-              View All Services
             </Link>
           </div>
         </div>

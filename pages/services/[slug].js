@@ -5,10 +5,13 @@ import { useState } from "react";
 import { ArrowRight, CheckCircle, MessageCircle } from "lucide-react";
 import { mainServices } from "../../data/mainServices";
 import { services as detailedServices } from "../../data/services";
+import { useCurrency } from "../../components/CurrencyContext";
+import { toNgn, formatMoney, gatewayCurrency } from "../../lib/currency";
 
 export default function ServiceDetail() {
   const router = useRouter();
   const { slug } = router.query;
+  const { gateway } = useCurrency();
   const [mediaModalOpen, setMediaModalOpen] = useState(false);
   const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
 
@@ -67,14 +70,12 @@ export default function ServiceDetail() {
 
   const isPerNight = service.duration?.toLowerCase().includes("per night");
 
+  // Nigerians see Naira (charged via Paystack); everyone else sees USD.
+  const localCurrency = service.currency === "CAD" ? "CAD" : gatewayCurrency(gateway);
   const formattedPrice = service.price
-    ? service.currency === "CAD"
-      ? isPerNight
-        ? `CAD ${service.price} / night`
-        : `CAD ${service.price}`
-      : isPerNight
-        ? `$${service.price} / night`
-        : `$${service.price}`
+    ? `${formatMoney(localCurrency === "NGN" ? toNgn(service.price) : service.price, localCurrency)}${
+        isPerNight ? " / night" : ""
+      }`
     : "Contact us";
 
   const durationLabel = isPerNight

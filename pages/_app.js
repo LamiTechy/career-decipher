@@ -2,10 +2,11 @@ import "../styles/globals.css";
 import { Toaster } from "react-hot-toast";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { CurrencyProvider } from "../components/CurrencyContext";
 
 export default function App({ Component, pageProps }) {
   return (
-    <>
+    <CurrencyProvider>
       <Navbar />
       <main>
         <Component {...pageProps} />
@@ -27,6 +28,6 @@ export default function App({ Component, pageProps }) {
           },
         }}
       />
-    </>
+    </CurrencyProvider>
   );
 }

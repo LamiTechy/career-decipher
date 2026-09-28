@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarDays, Heart } from "lucide-react";
+import { Heart } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -54,14 +54,6 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-            <div className="mt-6 text-sm space-y-2 text-cream-200/70">
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-cream-100/10 text-cream-100">
-                  <CalendarDays className="w-4 h-4" />
-                </span>
-                <span>Mon–Fri, 9am–6pm EST</span>
-              </div>
-            </div>
           </div>
         </div>
 

@@ -57,13 +57,20 @@ export default async function handler(req, res) {
     return res.status(400).json({ status: false, message: "Missing successUrl or cancelUrl." });
   }
 
-  // Prices are entered in USD — Paystack charges USD directly (no conversion)
-  const amountInCents = Math.round(rawAmount * 100);
+  // Amount is sent in whole units of the currency (₦ or $); Paystack takes kobo/cents.
+  const payCurrency = (currency || "USD").toUpperCase();
+  if (!["NGN", "USD"].includes(payCurrency)) {
+    return res.status(400).json({ status: false, message: "Currency must be NGN or USD." });
+  }
 
-  if (amountInCents < 50) {
+  const chargedAmount = payCurrency === "NGN" ? Math.round(rawAmount) : rawAmount;
+  const amountInSubunit = Math.round(chargedAmount * 100);
+  const minimumSubunit = payCurrency === "NGN" ? 10000 : 50;
+
+  if (amountInSubunit < minimumSubunit) {
     return res.status(400).json({
       status: false,
-      message: "Amount must be at least $0.50 USD.",
+      message: `Amount must be at least ${payCurrency === "NGN" ? "₦100" : "$0.50"} ${payCurrency}.`,
     });
   }
 
@@ -76,14 +83,15 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         email,
-        amount: amountInCents,
-        currency: "USD",
+        amount: amountInSubunit,
+        currency: payCurrency,
         callback_url: successUrl,
         metadata: {
           name,
           phone: phone || "",
           service: name,
-          amount_usd: rawAmount,
+          amount_charged: chargedAmount,
+          currency: payCurrency,
         },
       }),
     });

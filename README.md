@@ -107,17 +107,15 @@ Leave the field blank to enter directly in development.
 
 ## 📧 Email Confirmation
 
-Email confirmation is currently **mocked** (logged to console). To enable real emails:
+Confirmation and meeting-invite emails are sent with **Brevo (ex-Sendinblue) SMTP** via `lib/sendBookingEmail.js` and `lib/sendMeetingEmail.js`.
 
-1. `npm install nodemailer`
-2. Add to `.env.local`:
-   ```
-   SMTP_HOST=smtp.gmail.com
-   SMTP_PORT=587
-   SMTP_USER=your@gmail.com
-   SMTP_PASS=your_app_password
-   ```
-3. Add a `sendConfirmationEmail()` call in `pages/api/bookings.js`
+Add to `.env.local`:
+
+```
+BREVO_SMTP_USER=your-brevo-login-email
+BREVO_SMTP_KEY=your-smtp-key
+BREVO_SENDER_EMAIL=bookings@yourdomain.com
+```
 
 ---
 
@@ -143,48 +141,52 @@ Email confirmation is currently **mocked** (logged to console). To enable real e
 | Animations | CSS keyframes + IntersectionObserver |
 | Calendar   | react-calendar                       |
 | Toasts     | react-hot-toast                      |
-| Database   | JSON file (`data/bookings.json`)     |
+| Database   | Neon (Postgres, `lib/db.js`)        |
 | API        | Next.js API Routes                   |
 
 ---
 
 ## 📦 Services & Pricing
 
-| Service                      | Duration | Price  |
-| ---------------------------- | -------- | ------ |
-| Career Consultation          | 30 mins  | $45    |
-| Resume Review                | 30 mins  | $45    |
-| Resume & Cover Letter Review | 1 hr     | $70    |
-| Cover Letter Review          | 30 mins  | $45    |
-| Interview Preparation        | 1 hr     | $70    |
-| LinkedIn Optimization        | Custom   | Custom |
-| On-the-Job Mentorship        | 1 hr     | $120   |
-| Bundle Package               | 5 hrs    | $250   |
+| Service                      | Duration | Price  | Price (NGN) |
+| ---------------------------- | -------- | ------ | ----------- |
+| Career Consultation          | 30 mins  | $45    | ₦45,000     |
+| Resume Review                | 30 mins  | $45    | ₦45,000     |
+| Resume & Cover Letter Review | 1 hr     | $70    | ₦70,000     |
+| Cover Letter Review          | 30 mins  | $45    | ₦45,000     |
+| Interview Preparation        | 1 hr     | $70    | ₦70,000     |
+| LinkedIn Optimization        | Custom   | Custom | Custom      |
+| On-the-Job Mentorship        | 1 hr     | $120   | ₦120,000    |
+| Bundle Package               | 5 hrs    | $250   | ₦250,000    |
+
+Naira prices are derived from the USD price in `lib/currency.js`: **USD × 1000, rounded up to the nearest ₦1,000** (override the rate with `NEXT_PUBLIC_USD_TO_NGN_RATE`).
 
 ---
 
-## 🔧 Environment Variables (Optional)
+## 🔧 Environment Variables
 
-Create a `.env.local` file for production:
+All variables the code reads — copy into `.env.local`:
 
 ```env
-# Stripe (for real payments)
-STRIPE_SECRET_KEY=sk_test_...
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+# Neon/Postgres — bookings, apartment availability, admin, emails
+DATABASE_URL=
 
-# Email (Nodemailer)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=hello@careerdecipher.com
-SMTP_PASS=your_app_password
+# Paystack - buyers detected in Nigeria, charged in NGN
+PAYSTACK_SECRET_KEY=
 
-# Admin
-ADMIN_KEY=your_secure_admin_key
+# Stripe - buyers everywhere else, charged in USD (Stripe converts to local currency)
+STRIPE_SECRET_KEY=
+
+# Optional: USD to NGN rate for Naira prices (default 1000)
+NEXT_PUBLIC_USD_TO_NGN_RATE=
+
+# Brevo SMTP — booking confirmation + meeting invite emails
+BREVO_SMTP_USER=
+BREVO_SMTP_KEY=
+BREVO_SENDER_EMAIL=
 ```
 
-The app now fetches the USD → NGN exchange rate automatically at runtime using `/api/exchange-rate`.
-
-`NEXT_PUBLIC_USD_TO_NGN_RATE` is optional and is used only as a fallback or manual override if the live fetch fails.
+Checkout auto-detects the buyer's location: **Nigeria → Paystack (charged in ₦)**, everywhere else → **Stripe (charged in USD)**. Prices are stored in USD in `/data` and converted for display and charging by `lib/currency.js`; only one currency is shown per visitor, based on their location. Stripe shows the buyer's local currency at checkout.
 
 ---
 
@@ -195,7 +197,7 @@ npm install -g vercel
 vercel
 ```
 
-> Note: JSON file storage won't persist on Vercel (serverless). For production, swap to **MongoDB Atlas**, **Supabase**, or **PlanetScale**.
+> Note: bookings live in Neon Postgres (`DATABASE_URL`), which persists on Vercel — just set the env vars in the project settings.
 
 ---
 
