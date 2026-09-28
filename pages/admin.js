@@ -8,7 +8,8 @@ export async function getServerSideProps() {
   try {
     const { default: sql } = await import("../lib/db");
     const bookings = await sql`SELECT * FROM bookings ORDER BY created_at DESC`;
-    return { props: { initialBookings: bookings } };
+    // Neon returns Date objects for timestamp columns — make them JSON-safe.
+    return { props: { initialBookings: JSON.parse(JSON.stringify(bookings)) } };
   } catch {
     return { props: { initialBookings: [] } };
   }
@@ -114,7 +115,7 @@ export default function Admin({ initialBookings }) {
     revenueNgn: paidBookings
       .filter(isNgn)
       .reduce((sum, b) => sum + (b.service?.payment?.amount || 0), 0),
-    today: bookings.filter((b) => b.createdAt && new Date(b.createdAt).toDateString() === new Date().toDateString()).length,
+    today: bookings.filter((b) => b.created_at && new Date(b.created_at).toDateString() === new Date().toDateString()).length,
   };
 
   if (!unlocked) {
@@ -279,7 +280,7 @@ export default function Admin({ initialBookings }) {
                       : []),
                     ["Date", formatDate(selected.date)],
                     ["Time", selected.time || "–"],
-                    ["Booked On", formatDate(selected.createdAt)],
+                    ["Booked On", formatDate(selected.created_at)],
                   ].map(([label, val]) => (
                     <div key={label} className="flex justify-between gap-2">
                       <span className="text-slate-850/50 shrink-0">{label}</span>

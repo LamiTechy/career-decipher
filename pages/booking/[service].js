@@ -254,7 +254,7 @@ export default function ServiceBooking() {
     }
   };
 
-  const verifyPayment = async (reference) => {
+  const verifyPayment = async (reference, restored = null) => {
     if (!reference) return;
     setLoading(true);
     setPaymentError(null);
@@ -272,7 +272,7 @@ export default function ServiceBooking() {
       }
 
       setPaymentStatus("paid");
-      await completeBooking();
+      await completeBooking(restored);
     } catch (err) {
       setPaymentError(err.message || "Unable to verify payment.");
       toast.error(err.message || "Unable to verify payment.");
@@ -281,7 +281,7 @@ export default function ServiceBooking() {
     }
   };
 
-  const verifyStripe = async (sessionId) => {
+  const verifyStripe = async (sessionId, restored = null) => {
     if (!sessionId) return;
     setLoading(true);
     setPaymentError(null);
@@ -299,7 +299,7 @@ export default function ServiceBooking() {
       }
 
       setPaymentStatus("paid");
-      await completeBooking();
+      await completeBooking(restored);
     } catch (err) {
       setPaymentError(err.message || "Unable to verify payment.");
       toast.error(err.message || "Unable to verify payment.");
@@ -308,12 +308,20 @@ export default function ServiceBooking() {
     }
   };
 
-  const completeBooking = async () => {
+  // `restored` carries the booking details saved to localStorage before the
+  // gateway redirect — state updates from the restore effect are not visible
+  // inside this closure, so fall back to it for anything not in live state.
+  const completeBooking = async (restored = null) => {
     setLoading(true);
     const isShortlet = service === "shortlet";
 
-    const basePrice = isShortlet && selectedApartment ? selectedApartment.price : serviceData.price;
-    const payment = paymentRef.current || {
+    const finalDate = selectedDate?.toISOString() || restored?.selectedDate || null;
+    const finalTime = selectedTime || restored?.selectedTime || "N/A";
+    const finalCustomer = form.name || form.email ? form : restored?.customer || form;
+    const finalApartment = selectedApartment || restored?.selectedApartment || null;
+
+    const basePrice = isShortlet && finalApartment ? finalApartment.price : serviceData.price;
+    const payment = paymentRef.current || restored?.payment || {
       amount: payCurrency === "NGN" ? toNgn(basePrice) : basePrice,
       currency: payCurrency,
     };
@@ -322,12 +330,12 @@ export default function ServiceBooking() {
       const bookingData = {
         service: {
           ...serviceData,
-          ...(isShortlet && selectedApartment && { apartment: selectedApartment }),
+          ...(isShortlet && finalApartment && { apartment: finalApartment }),
           ...(isConnect ? {} : { payment }),
         },
-        date: selectedDate?.toISOString(),
-        time: selectedTime || "N/A",
-        customer: form,
+        date: finalDate,
+        time: finalTime,
+        customer: finalCustomer,
         paymentStatus: isConnect ? "pending" : "paid",
       };
 
@@ -367,9 +375,9 @@ export default function ServiceBooking() {
       }
       setStep(service === "shortlet" ? 5 : 4);
       if (reference) {
-        verifyPayment(reference);
+        verifyPayment(reference, savedState);
       } else {
-        verifyStripe(sessionId);
+        verifyStripe(sessionId, savedState);
       }
       hasVerifiedSession.current = true;
     }
