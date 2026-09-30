@@ -30,7 +30,6 @@ export default function ServiceDetail() {
     duration: detailedService?.duration || mainService?.duration,
     highlights: detailedService?.highlights || mainService?.highlights || [],
     includes: mainService?.includes || detailedService?.highlights || [],
-    benefits: detailedService?.benefits || [],
     faq: detailedService?.faq || [],
     caseStudies: mainService?.caseStudies || [],
     media: mainService?.media || detailedService?.media || [],
@@ -223,17 +222,6 @@ export default function ServiceDetail() {
                       <div key={item} className="flex items-start gap-3">
                         <CheckCircle className="w-5 h-5 text-forest-500 flex-shrink-0 mt-0.5" />
                         <span className="text-slate-700">{item}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">Key Benefits</h2>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {service.benefits.map((benefit) => (
-                      <div key={benefit} className="p-4 rounded-2xl bg-white border border-cream-200">
-                        <p className="text-slate-700">{benefit}</p>
                       </div>
                     ))}
                   </div>
